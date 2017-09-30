@@ -1,0 +1,25 @@
+{
+  "name": "firesphere/stripeslack",
+  "description": "Easy invite new users to your slack group",
+  "type": "silverstripe-module",
+  "keywords": ["silverstripe", "slack", "invite"],
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Simon 'Sphere' Erkelens",
+      "email": "github@casa-laguna.net",
+      "homepage": "https://casa-laguna.net",
+      "role": "Developer"
+    }
+  ],
+  "require":
+  {
+    "silverstripe/framework": "~3.0",
+    "silverstripe/siteconfig": "~3.0",
+    "silverstripe/cms": "~3.0"
+  },
+  "extra": {
+    "installer-name": "stripeslack"
+  },
+  "target-dir": "stripeslack"
+}

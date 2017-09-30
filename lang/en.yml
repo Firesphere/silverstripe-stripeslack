@@ -1,0 +1,13 @@
+en:
+  SlackAdmin:
+    MENUTITLE: 'Slack Invites'
+  SlackInvite:
+    PLURALNAME: 'Slack Invites'
+    SINGULARNAME: 'Slack Invite'
+  SlackSignupForm:
+    ConfigError: 'There is an error in the Slack Configuration'
+    Email: 'My email address is'
+    Intro: 'Fill out the form below to request access to Slack'
+    Name: 'My name is'
+    NoSuccessPage: 'An invite has been sent to your inbox'
+    Submit: Submit

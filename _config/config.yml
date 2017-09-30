@@ -1,0 +1,6 @@
+SiteConfig:
+  extensions:
+    - StripeSlackSiteConfigExtension
+ContentController:
+  extensions:
+    - SlackControllerExtension

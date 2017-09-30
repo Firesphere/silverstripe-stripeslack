@@ -1,0 +1,3 @@
+Director:
+  rules:
+    'SlackAuthorization//$Action//$ID//$OtherID': SlackAuthController
