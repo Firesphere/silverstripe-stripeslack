@@ -41,5 +41,13 @@ class SlackInvite extends DataObject
                 )
             );
         }
+        return $fields;
+    }
+
+    public function reSend()
+    {
+        /** @var SlackSignupForm $form */
+        $form = Injector::inst()->get(SlackSignupForm::class);
+        $form->inviteUser($this);
     }
 }
