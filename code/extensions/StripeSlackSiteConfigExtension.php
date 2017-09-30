@@ -10,7 +10,6 @@
  * @property string $SlackClientSecret
  * @property string $SlackChannel
  * @property string $SlackToken
- * @property null|bool $ClearSecrets
  * @property int $SlackBackURLID
  * @property int $SlackErrorBackURLID
  * @method SiteTree SlackBackURL()

@@ -7,11 +7,12 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
 {
 
     /**
-     * {@inheritDoc}
+     * @param GridField $gridField
+     * @param array $columns
      */
     public function augmentColumns($gridField, &$columns)
     {
-        if (!in_array('Actions', $columns)) {
+        if (!in_array('Actions', $columns, true)) {
             $columns[] = 'Actions';
         }
     }
@@ -57,7 +58,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
             ->setDisabled(true);
         if (!$record->Invited) {
             $field = GridField_FormAction::create(
-                $gridField, 'Resend' . $record->ID, false, "resend", array('RecordID' => $record->ID)
+                $gridField, 'Resend' . $record->ID, false, 'resend', array('RecordID' => $record->ID)
             )
                 ->addExtraClass('gridfield-button-resend')
                 ->setAttribute('title', 'resend')
@@ -85,6 +86,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
         if ($actionName === 'resend') {
+            /** @var SlackInvite $item */
             $item = $gridField->getList()->byID($arguments['RecordID']);
             if (!$item) {
                 return;

@@ -69,11 +69,16 @@ class SlackSignupForm extends Form
     }
 
     /**
+     * This method is public, so it can be addressed from the CMS.
+     *
+     * @todo Make sure that if it's a CMS User, no redirection happens
+     *
      * @param SlackInvite $signup
      * @throws \ValidationException
      */
     public function inviteUser($signup)
     {
+        /** @var SiteConfig $config */
         $config = SiteConfig::current_site_config();
         if (!$config->SlackURL || !$config->SlackToken) {
             if ($config->SlackErrorBackURLID) {
