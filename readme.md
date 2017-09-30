@@ -103,6 +103,14 @@ Textual changes can be made in a translation file in your base project. See `str
 
 The form relies completely on the provided `FormField` templates. So styling is all up to you.
 
+## Todo
+
+- [ ] Add tests
+- [ ] Make invites sent to a certain channel
+- [ ] Re-try sending invites via the CMS
+- [ ] Move away from `RestfulService` (Removed in SS4) to using `Guzzle`
+- [ ] SilverStripe 4 compatible version
+
 # Cow?
 
 ```
