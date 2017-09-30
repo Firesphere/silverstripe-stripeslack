@@ -1,6 +1,8 @@
 <?php
 
 
+use ValidationException;
+
 class SlackSignupForm extends Form
 {
 
@@ -74,7 +76,7 @@ class SlackSignupForm extends Form
      * @todo Make sure that if it's a CMS User, no redirection happens
      *
      * @param SlackInvite $signup
-     * @throws \ValidationException
+     * @throws ValidationException
      */
     public function inviteUser($signup)
     {

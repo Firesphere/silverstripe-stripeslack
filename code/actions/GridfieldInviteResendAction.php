@@ -51,19 +51,23 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
      */
     public function getColumnContent($gridField, $record, $columnName)
     {
+        $config = SiteConfig::current_site_config();
         $field = GridField_FormAction::create($gridField, 'null', false, '', [])
             ->setAttribute('title', 'Already invited')
             ->setAttribute('data-icon', 'cross-circle_disabled')
             ->setDescription('Invite successful')
             ->setDisabled(true);
-        if (!$record->Invited) {
-            $field = GridField_FormAction::create(
-                $gridField, 'Resend' . $record->ID, false, 'resend', array('RecordID' => $record->ID)
-            )
-                ->addExtraClass('gridfield-button-resend')
-                ->setAttribute('title', 'resend')
-                ->setAttribute('data-icon', 'arrow-circle-135-left')
-                ->setDescription(_t('GridfieldInviteResendAction.Resend', 'Resend invitation'));
+        // No point in showing the re-send button, if there's no token
+        if ($config->SlackToken) {
+            if (!$record->Invited) {
+                $field = GridField_FormAction::create(
+                    $gridField, 'Resend' . $record->ID, false, 'resend', array('RecordID' => $record->ID)
+                )
+                    ->addExtraClass('gridfield-button-resend')
+                    ->setAttribute('title', 'resend')
+                    ->setAttribute('data-icon', 'arrow-circle-135-left')
+                    ->setDescription(_t('GridfieldInviteResendAction.Resend', 'Resend invitation'));
+            }
         }
 
         return $field->Field();

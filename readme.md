@@ -107,7 +107,7 @@ The form relies completely on the provided `FormField` templates. So styling is 
 
 - [ ] Add tests
 - [ ] Make invites sent to a certain channel
-- [ ] Re-try sending invites via the CMS
+- [x] Re-try sending invites via the CMS
 - [ ] Move away from `RestfulService` (Removed in SS4) to using `Guzzle`
 - [ ] SilverStripe 4 compatible version
 

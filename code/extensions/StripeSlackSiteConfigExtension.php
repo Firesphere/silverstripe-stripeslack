@@ -10,6 +10,7 @@
  * @property string $SlackClientSecret
  * @property string $SlackChannel
  * @property string $SlackToken
+ * @property boolean $ClearSecrets
  * @property int $SlackBackURLID
  * @property int $SlackErrorBackURLID
  * @method SiteTree SlackBackURL()
@@ -24,6 +25,8 @@ class StripeSlackSiteConfigExtension extends DataExtension
         'SlackClientSecret' => 'Varchar(255)',
         'SlackChannel'      => 'Varchar(255)',
         'SlackToken'        => 'Varchar(255)',
+        // This is here to support the IDE's
+        'ClearSecrets'      => 'Boolean(false)'
     ];
 
     private static $has_one = [
@@ -57,17 +60,22 @@ class StripeSlackSiteConfigExtension extends DataExtension
                 '</a></p>'
             );
             $fields->addFieldToTab('Root.Slack', $text);
+        } else {
+            $fields->addFieldToTab('Root.Slack',
+                $secretField = CheckboxField::create('ClearSecrets', 'Clear Secrets and Tokens'));
+            $secretField->setDescription('Checking this checkbox will clear out the Client Secret and (invisible in the CMS) Client Token. In case your admin left the group, or you want a new admin to sent the invite');
         }
         $channel->setDescription('You can get the ID by right clicking on your channel and select "copy link". Open the copied link in a browser and copy the part after "messages/" in to this field');
         $url->setDescription('Include the "https://" part');
 
         $fields->addFieldToTab('Root.Slack',
-            LiteralField::create('instructions', '<p><a href="https://github.com/Firesphere/silverstripe-stripeslack/blob/master/readme.md">Extensive instructions can be found on GitHub</a></p>'));
-        $fields->addFieldToTab('Root.Slack',
-            $secretField = CheckboxField::create('ClearSecrets', 'Clear Secrets and Tokens'));
-        $secretField->setDescription('Checking this checkbox will clear out the Client Secret and (invisible in the CMS) Client Token. In case your admin left the group, or you want a new admin to sent the invite');
+            LiteralField::create('instructions',
+                '<p><a href="https://github.com/Firesphere/silverstripe-stripeslack/blob/master/readme.md">Extensive instructions can be found on GitHub</a></p>'));
     }
 
+    /**
+     * Clear out the secrets if the checkbox is checked
+     */
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -75,5 +83,7 @@ class StripeSlackSiteConfigExtension extends DataExtension
             $this->owner->SlackClientSecret = '';
             $this->owner->SlackToken = '';
         }
+        // Always set back to false so the checkbox won't stay ticked
+        $this->owner->ClearSecrets = false;
     }
 }
