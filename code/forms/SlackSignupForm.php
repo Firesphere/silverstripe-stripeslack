@@ -72,7 +72,6 @@ class SlackSignupForm extends Form
     /**
      * This method is public, so it can be addressed from the CMS.
      *
-     * @todo Make sure that if it's a CMS User, no redirection happens
      *
      * @param SlackInvite $signup
      * @throws ValidationException
@@ -83,15 +82,7 @@ class SlackSignupForm extends Form
         $config = SiteConfig::current_site_config();
         // Break if there is a configuration error
         if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
-            if ($config->SlackErrorBackURLID) {
-                $this->controller->redirect($config->SlackErrorBackURL()->Link());
-            } else {
-                $this->sessionMessage(
-                    _t('SlackSignupForm.ConfigError', 'There is an error in the Slack Configuration'),
-                    'warning'
-                );
-                $this->controller->redirectBack();
-            }
+            $this->redirectSlack(false, $config);
         }
         /** @var RestfulService $service with an _uncached_ response */
         $service = RestfulService::create($config->SlackURL, 0);
@@ -114,19 +105,59 @@ class SlackSignupForm extends Form
             $signup->Invited = (bool)$result['ok'];
         }
 
-        $signup->write();
+        $signup->ID = $signup->write();
+
         $this->updateDuplicates($signup);
 
+        $this->redirectSlack(true, $config);
+    }
+
+    /**
+     *
+     * @param boolean $success
+     * @param SiteConfig $config
+     * @return bool|SS_HTTPResponse
+     */
+    public function redirectSlack($success, $config)
+    {
+        $controller = Controller::curr();
+        if ($controller instanceof ModelAdmin) {
+            // In theory, this shows a message in the CMS
+            // In practice, it seems to do nothing
+            if ($success === true) {
+                return $controller->getResponse()->setStatusCode(
+                    200,
+                    'User successfully invited.'
+                );
+            } else {
+                return $controller->getResponse()->setStatusCode(
+                    500,
+                    'Something went wrong when inviting the user.'
+                );
+            }        }
+        if (!$success) {
+            if ($config->SlackErrorBackURLID) {
+                return $this->controller->redirect($config->SlackErrorBackURL()->Link());
+            } else {
+                $this->sessionMessage(
+                    _t('SlackSignupForm.ConfigError', 'There is an error in the Slack Configuration'),
+                    'warning'
+                );
+                return $this->controller->redirectBack();
+            }
+        }
         if ($config->SlackBackURLID) {
-            $this->controller->redirect($config->SlackBackURL()->Link());
+            return $this->controller->redirect($config->SlackBackURL()->Link());
         } else {
             $this->sessionMessage(_t('SlackSignupForm.NoSuccessPage', 'An invite has been sent to your inbox'), 'good');
-            $this->controller->redirectBack();
+            return $this->controller->redirectBack();
         }
+
     }
 
     /**
      * @param SlackInvite $signup
+     * @throws \ValidationException
      */
     protected function updateDuplicates($signup)
     {
