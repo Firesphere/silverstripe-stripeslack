@@ -33,7 +33,6 @@ jobs:
 
       - run: composer create-project silverstripe/installer:~3 ~/var/www -n
       - run: composer require firesphere/stripeslack:dev-master
-      - run: composer require phpunit/PHPUnit:3.7
       - run: composer update -n --prefer-dist
       - run: rm phpunit.xml.dist
       - run: cp stripeslack/phpunit.xml.dist .
