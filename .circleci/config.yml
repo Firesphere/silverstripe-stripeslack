@@ -32,7 +32,7 @@ jobs:
             php -r "unlink('composer-setup.php');"
             php -r "unlink('composer.phar');"
 
-      - run: composer create-project silverstripe/installer:3.1 ~/var/www -n
+      - run: composer create-project silverstripe/installer:~3 ~/var/www -n
       - run: cd ~/var/www; composer install
       - run: composer require firesphere/stripeslack:dev-master
       - run: composer require phpunit/PHPUnit:3.7
