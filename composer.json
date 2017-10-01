@@ -22,7 +22,10 @@
     "scriptfusion/phpunit-immediate-exception-printer": "^2.0"
   },
   "extra": {
-    "installer-name": "stripeslack"
+    "installer-name": "stripeslack",
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    }
   },
   "target-dir": "stripeslack"
 }
