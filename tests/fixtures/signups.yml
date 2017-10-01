@@ -1,0 +1,10 @@
+SlackInvite:
+  invite1:
+    Name: Testuser
+    Email: test@silverstripe.com
+  invite2:
+    Name: Testuser2
+    Email: test@silverstripe.com
+  invite3:
+    Name: Testuser3
+    Email: test@silverstripe.com

@@ -14,9 +14,13 @@
   ],
   "require":
   {
-    "silverstripe/framework": "~3.0",
-    "silverstripe/siteconfig": "~3.0",
-    "silverstripe/cms": "~3.0"
+    "silverstripe/framework": "~3.1",
+    "silverstripe/siteconfig": "~3.1",
+    "silverstripe/cms": "~3.1"
+  },
+  "require-dev": {
+    "phpunit/PHPUnit": "^5.7",
+    "scriptfusion/phpunit-immediate-exception-printer": "^2.0"
   },
   "extra": {
     "installer-name": "stripeslack"

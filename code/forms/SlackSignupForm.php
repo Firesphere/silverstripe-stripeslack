@@ -159,7 +159,7 @@ class SlackSignupForm extends Form
      * @param SlackInvite $signup
      * @throws \ValidationException
      */
-    protected function updateDuplicates($signup)
+    public function updateDuplicates($signup)
     {
         /** @var DataList|SlackInvite[] $signupDuplicates */
         $signupDuplicates = SlackInvite::get()->filter(['Email' => $signup->Email, 'Invited' => false]);

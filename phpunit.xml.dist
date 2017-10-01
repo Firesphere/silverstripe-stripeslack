@@ -1,0 +1,14 @@
+<phpunit printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter"
+		 bootstrap="framework/tests/bootstrap.php"
+		 colors="true">
+
+	<testsuite name="Default">
+		<directory>stripeslack/tests</directory>
+	</testsuite>
+
+	<groups>
+		<exclude>
+			<group>sanitychecks</group>
+		</exclude>
+	</groups>
+</phpunit>
