@@ -1,6 +1,4 @@
-<phpunit printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter"
-		 bootstrap="framework/tests/bootstrap.php"
-		 colors="true">
+<phpunit bootstrap="framework/tests/bootstrap.php" colors="true">
 
 	<testsuite name="Default">
 		<directory>stripeslack/tests</directory>
