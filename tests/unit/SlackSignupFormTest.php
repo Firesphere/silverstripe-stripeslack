@@ -15,7 +15,7 @@ class SlackSignupFormTest extends SapphireTest
     public function testUpdateDuplicates()
     {
         /** @var SlackSignupForm $form */
-        $form = Injector::inst()->get('SlackSignupForm');
+        $form = Injector::inst()->createWithArgs('SlackSignupForm', [null, __FUNCTION__]);
         /** @var SlackInvite $user */
         $user = $this->objFromFixture(SlackInvite::class, 'invite1');
         $form->updateDuplicates($user);
