@@ -40,4 +40,4 @@ jobs:
       - run: framework/sake dev/build
 
       # run tests!
-      - run: vendor/bin/phpunit stripeslack/tests/unit -d memory_limit=512M
+      - run: vendor/bin/phpunit -d memory_limit=1G stripeslack/tests/unit
