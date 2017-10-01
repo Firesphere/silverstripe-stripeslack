@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * class GridfieldInviteResendAction adds the resend button to the CMS for easy re-inviting
  */
 class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField_ActionProvider
 {

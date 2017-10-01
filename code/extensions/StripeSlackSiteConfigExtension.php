@@ -34,17 +34,38 @@ class StripeSlackSiteConfigExtension extends DataExtension
         'SlackErrorBackURL' => SiteTree::class
     ];
 
+    private static $helptexts = [
+        'Link'         => 'To activate your StripeSlack, Please have an admin activate StripeSlack by clicking on this link.',
+        'ClearSecrets' => 'Checking this checkbox will clear out the Client Secret and (invisible in the CMS) Client Token. In case your admin left the group, or you want a new admin to sent the invite',
+        'Channel'      => 'You can get the ID by right clicking on your channel and select "copy link". Open the copied link in a browser and copy the part after "messages/" in to this field',
+        'URLHelp'      => 'Include the "https://" part',
+        'Extended'     => '<p><a href="https://github.com/Firesphere/silverstripe-stripeslack/blob/master/readme.md">Extensive instructions can be found on GitHub</a></p>'
+    ];
+
+    public function updateFieldLabels(&$labels)
+    {
+        $labels['SlackURL'] = _t('StripeSlackSiteConfigExtension.SlackURL', 'URL Of the Slack channel');
+        $labels['SlackClientID'] = _t('StripeSlackSiteConfigExtension.SlackClientID', 'Client ID for your Slack App');
+        $labels['SlackClientSecret'] = _t('StripeSlackSiteConfigExtension.SlackClientSecret',
+            'Client Secret for your Slack App');
+        $labels['SlackChannel'] = _t('StripeSlackSiteConfigExtension.SlackChannel', 'The ID of your channel');
+        $labels['ClearSecrets'] = _t('StripeSlackSiteConfigExtension.ClearSecrets', 'Clear Secrets and Tokens');
+        $labels['SlackBackURL'] = _t('StripeSlackSiteConfigExtension.SlackBackURL',
+            'URL to redirect when request is successful');
+        $labels['SlackErrorBackURL'] = _t('StripeSlackSiteConfigExtension.SlackErrorBackURL',
+            'URL to redirect when request is unsuccessful');
+    }
+
     public function updateCMSFields(FieldList $fields)
     {
         $fields->removeByName(['SlackToken']);
         $fields->addFieldsToTab('Root.Slack', [
-            $url = TextField::create('SlackURL', 'URL Of the Slack channel'),
-            $channel = TextField::create('SlackChannel', 'The ID of your channel'),
-            TextField::create('SlackClientID', 'Client ID for your Slack App'),
-            PasswordField::create('SlackClientSecret', 'Client Secret for your Slack App'),
-            TreeDropdownField::create('SlackBackURLID', 'URL to redirect when request is successful', 'SiteTree'),
-            TreeDropdownField::create('SlackErrorBackURLID', 'URL to redirect when request is unsuccessful',
-                'SiteTree'),
+            $url = TextField::create('SlackURL', $this->owner->fieldLabel('SlackURL')),
+            $channel = TextField::create('SlackChannel', $this->owner->fieldLabel('SlackChannel')),
+            TextField::create('SlackClientID', $this->owner->fieldLabel('SlackClientID')),
+            PasswordField::create('SlackClientSecret', $this->owner->fieldLabel('SlackClientSecret')),
+            TreeDropdownField::create('SlackBackURLID', $this->owner->fieldLabel('SlackBackURL'), 'SiteTree'),
+            TreeDropdownField::create('SlackErrorBackURLID', $this->owner->fieldLabel('SlackErrorBackURL'), 'SiteTree'),
         ]);
         if (
             $this->owner->SlackURL &&
@@ -56,21 +77,19 @@ class StripeSlackSiteConfigExtension extends DataExtension
             $text = LiteralField::create(
                 'link',
                 '<p><a href="' . $this->owner->SlackURL . '/oauth/authorize?client_id=' . $this->owner->SlackClientID . '&scope=client&back_url=' . $domain . '">' .
-                'To activate your StripeSlack, Please have an admin activate StripeSlack by clicking on this link.' .
+                static::$helptexts['Link'] .
                 '</a></p>'
             );
             $fields->addFieldToTab('Root.Slack', $text);
         } else {
             $fields->addFieldToTab('Root.Slack',
-                $secretField = CheckboxField::create('ClearSecrets', 'Clear Secrets and Tokens'));
-            $secretField->setDescription('Checking this checkbox will clear out the Client Secret and (invisible in the CMS) Client Token. In case your admin left the group, or you want a new admin to sent the invite');
+                $secretField = CheckboxField::create('ClearSecrets', $this->owner->fieldLabel('ClearSecrets')));
+            $secretField->setDescription(static::$helptexts['ClearSecrets']);
         }
-        $channel->setDescription('You can get the ID by right clicking on your channel and select "copy link". Open the copied link in a browser and copy the part after "messages/" in to this field');
-        $url->setDescription('Include the "https://" part');
+        $channel->setDescription(static::$helptexts['Channel']);
+        $url->setDescription(static::$helptexts['URLHelp']);
 
-        $fields->addFieldToTab('Root.Slack',
-            LiteralField::create('instructions',
-                '<p><a href="https://github.com/Firesphere/silverstripe-stripeslack/blob/master/readme.md">Extensive instructions can be found on GitHub</a></p>'));
+        $fields->addFieldToTab('Root.Slack', LiteralField::create('instructions', static::$helptexts['Extended']));
     }
 
     /**

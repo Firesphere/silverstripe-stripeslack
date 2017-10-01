@@ -1,8 +1,6 @@
 <?php
 
 
-use ValidationException;
-
 class SlackSignupForm extends Form
 {
 
@@ -41,7 +39,8 @@ class SlackSignupForm extends Form
     {
         return FieldList::create(
             [
-                LiteralField::create('Intro', _t('SlackSignupForm.Intro', 'Fill out the form below to request access to Slack')),
+                LiteralField::create('Intro',
+                    _t('SlackSignupForm.Intro', 'Fill out the form below to request access to Slack')),
                 TextField::create('Name', _t('SlackSignupForm.Name', 'My name is')),
                 EmailField::create('Email', _t('SlackSignupForm.Email', 'My email address is'))
             ]
@@ -82,15 +81,19 @@ class SlackSignupForm extends Form
     {
         /** @var SiteConfig $config */
         $config = SiteConfig::current_site_config();
-        if (!$config->SlackURL || !$config->SlackToken) {
+        // Break if there is a configuration error
+        if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
             if ($config->SlackErrorBackURLID) {
                 $this->controller->redirect($config->SlackErrorBackURL()->Link());
             } else {
-                $this->sessionMessage(_t('SlackSignupForm.ConfigError', 'There is an error in the Slack Configuration'), 'warning');
+                $this->sessionMessage(
+                    _t('SlackSignupForm.ConfigError', 'There is an error in the Slack Configuration'),
+                    'warning'
+                );
                 $this->controller->redirectBack();
             }
         }
-        /** @var RestfulService $service */
+        /** @var RestfulService $service with an _uncached_ response */
         $service = RestfulService::create($config->SlackURL, 0);
         $params = [
             'token'      => $config->SlackToken,
@@ -104,27 +107,38 @@ class SlackSignupForm extends Form
 
         $response = $service->request('/api/users.admin.invite?t=' . $now, 'POST', $params);
         $result = Convert::json2array($response->getBody());
+
         if (isset($result['error']) && $result['error'] === 'already_invited') {
             $signup->Invited = true;
         } else {
             $signup->Invited = (bool)$result['ok'];
         }
+
         $signup->write();
+        $this->updateDuplicates($signup);
+
+        if ($config->SlackBackURLID) {
+            $this->controller->redirect($config->SlackBackURL()->Link());
+        } else {
+            $this->sessionMessage(_t('SlackSignupForm.NoSuccessPage', 'An invite has been sent to your inbox'), 'good');
+            $this->controller->redirectBack();
+        }
+    }
+
+    /**
+     * @param SlackInvite $signup
+     */
+    protected function updateDuplicates($signup)
+    {
         /** @var DataList|SlackInvite[] $signupDuplicates */
         $signupDuplicates = SlackInvite::get()->filter(['Email' => $signup->Email, 'Invited' => false]);
-        
+
         if ($signup->Invited === true && $signupDuplicates->count() > 0) {
             // This user tried multiple times, now that Invited is true, let's set them all to true
             foreach ($signupDuplicates as $duplicate) {
                 $duplicate->Invited = true;
                 $duplicate->write();
             }
-        }
-        if ($config->SlackBackURLID) {
-            $this->controller->redirect($config->SlackBackURL()->Link());
-        } else {
-            $this->sessionMessage(_t('SlackSignupForm.NoSuccessPage', 'An invite has been sent to your inbox'), 'good');
-            $this->controller->redirectBack();
         }
     }
 }
