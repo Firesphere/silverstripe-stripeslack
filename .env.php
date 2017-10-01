@@ -6,6 +6,7 @@ define('SS_ENVIRONMENT_TYPE', 'dev');
 define('SS_DATABASE_SERVER', '127.0.0.1');
 define('SS_DATABASE_USERNAME', 'root');
 define('SS_DATABASE_PASSWORD', 'ubuntu');
+
 define('SS_DATABASE_NAME', 'circle_test');
 
 /* Configure a default username and password to access the CMS on all sites in this environment. */
