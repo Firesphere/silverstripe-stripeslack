@@ -1,8 +1,19 @@
 en:
+  GridfieldInviteResendAction:
+    Resend: 'Resend invitation'
+  Permissions:
+    SLACK_SLACKINVITE: 'Slack permissions'
   SlackAdmin:
     MENUTITLE: 'Slack Invites'
   SlackInvite:
+    PERMISSION_DELETE_DESCRIPTION: 'Delete Slack invites'
+    PERMISSION_DELETE_HELP: 'Permission required to delete existing Slack invites.'
+    PERMISSION_EDIT_DESCRIPTION: 'Edit Slack invites'
+    PERMISSION_EDIT_HELP: 'Permission required to edit existing Slack invites.'
+    PERMISSION_VIEW_DESCRIPTION: 'View Slack invites'
+    PERMISSION_VIEW_HELP: 'Permission required to view existing Slack invites.'
     PLURALNAME: 'Slack Invites'
+    Resend: '<p>To resend an invite, click the resend button in the overview</p>'
     SINGULARNAME: 'Slack Invite'
   SlackSignupForm:
     ConfigError: 'There is an error in the Slack Configuration'
@@ -11,3 +22,11 @@ en:
     Name: 'My name is'
     NoSuccessPage: 'An invite has been sent to your inbox'
     Submit: Submit
+  StripeSlackSiteConfigExtension:
+    ClearSecrets: 'Clear Secrets and Tokens'
+    SlackBackURL: 'URL to redirect when request is successful'
+    SlackChannel: 'The ID of your channel'
+    SlackClientID: 'Client ID for your Slack App'
+    SlackClientSecret: 'Client Secret for your Slack App'
+    SlackErrorBackURL: 'URL to redirect when request is unsuccessful'
+    SlackURL: 'URL Of the Slack channel'
