@@ -37,14 +37,19 @@ class SlackSignupForm extends Form
      */
     protected function getFormFields()
     {
-        return FieldList::create(
+        $fields = FieldList::create(
             [
                 LiteralField::create('Intro',
                     _t('SlackSignupForm.Intro', 'Fill out the form below to request access to Slack')),
                 TextField::create('Name', _t('SlackSignupForm.Name', 'My name is')),
                 EmailField::create('Email', _t('SlackSignupForm.Email', 'My email address is'))
+                    ->setAttribute('required', true),
             ]
         );
+
+        $this->extend('updateFormFields', $fields);
+
+        return $fields;
     }
 
     /**
