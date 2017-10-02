@@ -26,11 +26,11 @@ class SlackAuthController extends Controller
         $query = $this->getQuery($config, $code);
 
         // Setup and request the code
+        // @todo rewrite to Guzzle for SS4
         $service = RestfulService::create($baseURL, 'GET', null, 0);
         $response = $service->request($url . $query);
 
         $this->saveToken($response, $config);
-
 
         // A successful write should go back to the admin
         $this->redirect('/admin/settings#Root_Slack');
@@ -41,7 +41,7 @@ class SlackAuthController extends Controller
      * @param $code
      * @return string
      */
-    private function getQuery($config, $code)
+    public function getQuery($config, $code)
     {
         $params = [
             'client_id'     => $config->SlackClientID,
@@ -49,6 +49,7 @@ class SlackAuthController extends Controller
             'code'          => $code,
             'redirect_uri'  => Director::absoluteURL('/SlackAuthorization/'),
         ];
+
         return http_build_query($params);
     }
 
@@ -56,7 +57,7 @@ class SlackAuthController extends Controller
      * @param RestfulService_Response $response
      * @param SiteConfig $config
      */
-    private function saveToken($response, $config)
+    public function saveToken($response, $config)
     {
         // Convert the JSON to use in our config (hidden from user view)
         $result = Convert::json2array($response->getBody());

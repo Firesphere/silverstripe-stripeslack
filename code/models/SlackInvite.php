@@ -32,7 +32,7 @@ class SlackInvite extends DataObject implements PermissionProvider
     ];
 
     private static $better_buttons_actions = [
-        'reSend'
+        'resendInvite'
     ];
 
     public function getCMSFields()
@@ -70,6 +70,9 @@ class SlackInvite extends DataObject implements PermissionProvider
         return $fields;
     }
 
+    /**
+     * If the user isn't invited yet, send out the invite
+     */
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -81,7 +84,6 @@ class SlackInvite extends DataObject implements PermissionProvider
 
     /**
      * This method is public, so it can be addressed from the CMS.
-     *
      *
      * @param bool $resend
      * @throws \ValidationException
@@ -167,9 +169,10 @@ class SlackInvite extends DataObject implements PermissionProvider
      * Re-send this invite
      * @throws \ValidationException
      */
-    public function reSend()
+    public function resendInvite()
     {
         // Resend the invite. If the user has been invited before it should re-send
+        // The instance is needed so we know if we should write inside the `inviteUser` method
         $this->inviteUser((bool)$this->Invited, Controller::curr() instanceof ModelAdmin);
     }
 

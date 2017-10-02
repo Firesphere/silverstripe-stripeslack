@@ -15,8 +15,7 @@ class SlackAuthControllerTest extends SapphireTest
         $controller = Injector::inst()->get(SlackAuthController::class);
         $result = $controller->getQuery($config, '1234567890987654321');
 
-        $expected = 'client_id=' . $config->SlackClientID . '&client_secret=' . $config->SlackClientSecret .
-            'code&=1234567890987654321&redirect_uri=' .Director::absoluteURL('/SlackAuthorization/');
+        $expected = 'code&=1234567890987654321&redirect_uri=' . Director::absoluteURL('/SlackAuthorization/');
         $this->assertEquals($expected, $result);
     }
 
@@ -28,7 +27,7 @@ class SlackAuthControllerTest extends SapphireTest
 
         $config = SiteConfig::current_site_config();
         $controller->saveToken($response, $config);
-        $config = SiteConfig::current_site_config();
+        $config = SiteConfig::get()->byID($controller);
         $this->assertEquals('1234567890', $config->SlackToken);
 
     }

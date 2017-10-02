@@ -100,7 +100,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
                 return;
             }
 
-            return $item->reSend();
+            return $item->resendInvite();
         }
     }
 
