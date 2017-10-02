@@ -12,7 +12,7 @@ class SlackInviteTest extends SapphireTest
         parent::setUp();
     }
 
-    public function testUpdateDuplicates()
+    public function testDeleteDuplicates()
     {
         /** @var SlackInvite $user */
         $user = $this->objFromFixture(SlackInvite::class, 'invite1');
@@ -20,8 +20,6 @@ class SlackInviteTest extends SapphireTest
         $user->updateDuplicates();
         /** @var DataList|SlackInvite[] $result */
         $result = SlackInvite::get()->filter(['Email' => $user->Email]);
-        foreach ($result as $invite) {
-            $this->assertTrue($invite->Invited);
-        }
+        $this->assertEquals(1, $result->count());
     }
 }
