@@ -14,9 +14,6 @@ class SlackControllerExtension extends Extension
 
     public function SlackForm()
     {
-        if(SiteConfig::current_site_config()->SlackToken) {
-            return SlackSignupForm::create($this->owner, __FUNCTION__);
-        }
-        return null;
+        return SlackSignupForm::create($this->owner, __FUNCTION__);
     }
 }

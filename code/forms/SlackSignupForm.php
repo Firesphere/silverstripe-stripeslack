@@ -4,6 +4,7 @@
 class SlackSignupForm extends Form
 {
 
+    private $siteConfig;
     /**
      * SlackSignupForm constructor.
      * @param Controller $controller
@@ -19,6 +20,7 @@ class SlackSignupForm extends Form
         FieldList $actions = null,
         $validator = null
     ) {
+        $this->siteConfig = SiteConfig::current_site_config();
         if (!$controller) {
             $controller = Controller::curr();
         }
@@ -37,6 +39,12 @@ class SlackSignupForm extends Form
      */
     protected function getFormFields()
     {
+        if (!$this->siteConfig->SlackToken) {
+            return FieldList::create([
+                LiteralField::create('Setup',
+                    _t('SlackSignupForm.Setup', 'StripeSlack has not yet been configured correctly'))
+            ]);
+        }
         $fields = FieldList::create(
             [
                 LiteralField::create('Intro',
@@ -57,6 +65,9 @@ class SlackSignupForm extends Form
      */
     protected function getFormActions()
     {
+        if (!$this->siteConfig->SlackToken) {
+            return FieldList::create();
+        }
         return FieldList::create([
             FormAction::create('submitSlackForm', _t('SlackSignupForm.Submit', 'Submit'))
         ]);
