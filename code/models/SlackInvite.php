@@ -58,12 +58,12 @@ class SlackInvite extends DataObject implements PermissionProvider
     public function getBetterButtonsActions() {
         $fields = parent::getBetterButtonsActions();
         if($this->Invited) {
-            $fields->push(BetterButtonCustomAction::create('reSend', 'Resend')
+            $fields->push(BetterButtonCustomAction::create('resendInvite', 'Resend')
                 ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         }
         else {
-            $fields->push(BetterButtonCustomAction::create('reSend', 'Retry')
+            $fields->push(BetterButtonCustomAction::create('resendInvite', 'Retry')
                 ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         }
