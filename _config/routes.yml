@@ -1,3 +1,6 @@
+---
+Name: stripeslackroutes
+---
 Director:
   rules:
-    'SlackAuthorization//$Action//$ID//$OtherID': SlackAuthController
+    'SlackAuthorization': SlackAuthController
