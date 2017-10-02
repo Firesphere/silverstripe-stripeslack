@@ -31,6 +31,10 @@ class SlackInvite extends DataObject implements PermissionProvider
         'Invited.Nice' => 'Invite successful'
     ];
 
+    private static $better_buttons_actions = [
+        'reSend'
+    ];
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -48,14 +52,125 @@ class SlackInvite extends DataObject implements PermissionProvider
     }
 
     /**
+     * If BetterButtons is installed, add a button to resend or retry
+     * @return mixed
+     */
+    public function getBetterButtonsActions() {
+        $fields = parent::getBetterButtonsActions();
+        if($this->Invited) {
+            $fields->push(BetterButtonCustomAction::create('reSend', 'Resend')
+                ->setRedirectType(BetterButtonCustomAction::REFRESH)
+            );
+        }
+        else {
+            $fields->push(BetterButtonCustomAction::create('reSend', 'Retry')
+                ->setRedirectType(BetterButtonCustomAction::REFRESH)
+            );
+        }
+        return $fields;
+    }
+
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        if (!$this->Invited) {
+            $this->inviteUser();
+        }
+    }
+
+
+    /**
+     * This method is public, so it can be addressed from the CMS.
+     *
+     *
+     * @param bool $resend
+     * @throws \ValidationException
+     */
+    public function inviteUser($resend = false)
+    {
+        /** @var SiteConfig $config */
+        $config = SiteConfig::current_site_config();
+        // Break if there is a configuration error
+        if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
+            $this->Invited = false;
+        } else {
+            /** @var RestfulService $service with an _uncached_ response */
+            $params = [
+                'token'      => $config->SlackToken,
+                'type'       => 'post',
+                'email'      => $this->Email,
+                'set_active' => true,
+                'channel'    => $config->SlackChannel,
+                'scope'      => 'identify,read,post,client',
+            ];
+
+            if ($resend) {
+                $params['resend'] = true;
+            }
+            if ($this->Name) {
+                $params['first_name'] = $this->Name;
+            }
+
+            $this->doRequestEmail($config, $params);
+        }
+    }
+
+
+    /**
+     * @param SiteConfig $config
+     * @param array $params
+     */
+    private function doRequestEmail($config, $params)
+    {
+        $now = time();
+        $service = RestfulService::create($config->SlackURL, 0);
+
+        $response = $service->request('/api/users.admin.invite?t=' . $now, 'POST', $params);
+        $result = Convert::json2array($response->getBody());
+
+        if (isset($result['error']) && $result['error'] === 'already_invited') {
+            $this->Invited = true;
+        } else {
+            $this->Invited = (bool)$result['ok'];
+        }
+
+        if ($this->Invited) {
+            $this->updateDuplicates();
+        }
+
+        /*
+         * Only write here if we're in the CMS, don't write if the invite failed
+         * As that will cause a possible infinite loop
+         */
+        if ($this->Invited && Controller::curr() instanceof ModelAdmin) {
+            $this->write();
+        }
+    }
+
+    /**
+     * @throws \ValidationException
+     */
+    public function updateDuplicates()
+    {
+        /** @var DataList|SlackInvite[] $thisDuplicates */
+        $thisDuplicates = static::get()
+            ->filter(['Email' => $this->Email, 'Invited' => false])
+            ->exclude(['ID' => $this->ID]);
+
+        if ($this->Invited === true && $thisDuplicates->count() > 0) {
+            // This user tried multiple times, now that Invited is true, let's delete the others
+            $thisDuplicates->removeAll();
+        }
+    }
+
+    /**
      * Re-send this invite
      * @throws \ValidationException
      */
     public function reSend()
     {
-        /** @var SlackSignupForm $form */
-        $form = Injector::inst()->createWithArgs('SlackSignupForm', [null, __FUNCTION__]);
-        $form->inviteUser($this);
+        // Resend the invite. If the user has been invited before it should re-send
+        $this->inviteUser((bool)$this->Invited, Controller::curr() instanceof ModelAdmin);
     }
 
     /**
@@ -119,4 +234,5 @@ class SlackInvite extends DataObject implements PermissionProvider
     {
         return Permission::checkMember($member, array('VIEW_SLACKINVITE', 'CMS_ACCESS_SlackInviteAdmin'));
     }
+
 }

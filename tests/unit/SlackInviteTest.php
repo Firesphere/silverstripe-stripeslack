@@ -3,7 +3,7 @@
 /**
  * Class SlackSignupFormTest
  */
-class SlackSignupFormTest extends SapphireTest
+class SlackInviteTest extends SapphireTest
 {
     protected static $fixture_file = '../fixtures/signups.yml';
 
@@ -14,11 +14,10 @@ class SlackSignupFormTest extends SapphireTest
 
     public function testUpdateDuplicates()
     {
-        /** @var SlackSignupForm $form */
-        $form = Injector::inst()->createWithArgs('SlackSignupForm', [null, __FUNCTION__]);
         /** @var SlackInvite $user */
         $user = $this->objFromFixture(SlackInvite::class, 'invite1');
-        $form->updateDuplicates($user);
+        $user->Invited = true;
+        $user->updateDuplicates();
         /** @var DataList|SlackInvite[] $result */
         $result = SlackInvite::get()->filter(['Email' => $user->Email]);
         foreach ($result as $invite) {

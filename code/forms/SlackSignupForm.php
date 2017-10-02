@@ -70,61 +70,20 @@ class SlackSignupForm extends Form
     {
         $signup = SlackInvite::create();
         $form->saveInto($signup);
-        $signup->ID = $signup->write();
-        $this->inviteUser($signup);
-    }
-
-    /**
-     * This method is public, so it can be addressed from the CMS.
-     *
-     *
-     * @param SlackInvite $signup
-     * @throws ValidationException
-     */
-    public function inviteUser($signup)
-    {
-        /** @var SiteConfig $config */
-        $config = SiteConfig::current_site_config();
-        // Break if there is a configuration error
-        if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
-            $this->redirectSlack(false, $config);
-        }
-        /** @var RestfulService $service with an _uncached_ response */
-        $service = RestfulService::create($config->SlackURL, 0);
-        $params = [
-            'token'      => $config->SlackToken,
-            'type'       => 'post',
-            'email'      => $signup->Email,
-            'set_active' => true,
-            'channel'    => $config->SlackChannel,
-            'scope'      => 'identify,read,post,client'
-        ];
-        $now = time();
-
-        $response = $service->request('/api/users.admin.invite?t=' . $now, 'POST', $params);
-        $result = Convert::json2array($response->getBody());
-
-        if (isset($result['error']) && $result['error'] === 'already_invited') {
-            $signup->Invited = true;
-        } else {
-            $signup->Invited = (bool)$result['ok'];
-        }
-
-        $signup->ID = $signup->write();
-
-        $this->updateDuplicates($signup);
-
-        $this->redirectSlack(true, $config);
+        $userID = $signup->write();
+        /** @var SlackInvite $signup We need to re-fetch from the database after writing */
+        $signup = SlackInvite::get()->byID($userID);
+        $this->redirectSlack($signup->Invited);
     }
 
     /**
      *
      * @param boolean $success
-     * @param SiteConfig $config
      * @return bool|SS_HTTPResponse
      */
-    public function redirectSlack($success, $config)
+    public function redirectSlack($success)
     {
+        $config = SiteConfig::current_site_config();
         $controller = Controller::curr();
         if ($controller instanceof ModelAdmin) {
             // In theory, this shows a message in the CMS
@@ -158,23 +117,5 @@ class SlackSignupForm extends Form
             return $this->controller->redirectBack();
         }
 
-    }
-
-    /**
-     * @param SlackInvite $signup
-     * @throws \ValidationException
-     */
-    public function updateDuplicates($signup)
-    {
-        /** @var DataList|SlackInvite[] $signupDuplicates */
-        $signupDuplicates = SlackInvite::get()->filter(['Email' => $signup->Email, 'Invited' => false]);
-
-        if ($signup->Invited === true && $signupDuplicates->count() > 0) {
-            // This user tried multiple times, now that Invited is true, let's set them all to true
-            foreach ($signupDuplicates as $duplicate) {
-                $duplicate->Invited = true;
-                $duplicate->write();
-            }
-        }
     }
 }
