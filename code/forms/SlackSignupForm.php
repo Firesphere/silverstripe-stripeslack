@@ -88,6 +88,8 @@ class SlackSignupForm extends Form
     }
 
     /**
+     * This method seems long, but it's primarily switching between CMS and normal user
+     * Plus a check if the URL's are set on the config.
      *
      * @param boolean $success
      * @return bool|SS_HTTPResponse
@@ -109,7 +111,8 @@ class SlackSignupForm extends Form
                     500,
                     'Something went wrong when inviting the user.'
                 );
-            }        }
+            }
+        }
         if (!$success) {
             if ($config->SlackErrorBackURLID) {
                 return $this->controller->redirect($config->SlackErrorBackURL()->Link());
