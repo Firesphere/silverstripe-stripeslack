@@ -73,7 +73,7 @@ class StripeSlackSiteConfigExtension extends DataExtension
             $this->owner->SlackClientSecret &&
             !$this->owner->SlackToken
         ) {
-            $domain = Director::absoluteURL('/SlackAuthorization');
+            $domain = Director::absoluteURL('/SlackAuthorization/');
             $text = LiteralField::create(
                 'link',
                 '<p><a href="' . $this->owner->SlackURL . '/oauth/authorize?client_id=' . $this->owner->SlackClientID . '&scope=client&redirect_uri=' . $domain . '">' .

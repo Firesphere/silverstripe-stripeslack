@@ -21,6 +21,7 @@ class SlackAuthController extends Controller
             'client_id'     => $config->SlackClientID,
             'client_secret' => $config->SlackClientSecret,
             'code'          => $code,
+            'redirect_uri'  => Director::absoluteURL('/SlackAuthorization/'),
         ];
         $query = http_build_query($params);
         // Setup and request the code
