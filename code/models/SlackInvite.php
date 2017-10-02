@@ -54,7 +54,7 @@ class SlackInvite extends DataObject implements PermissionProvider
     public function reSend()
     {
         /** @var SlackSignupForm $form */
-        $form = Injector::inst()->get('SlackSignupForm');
+        $form = Injector::inst()->createWithArgs('SlackSignupForm', [null, __FUNCTION__]);
         $form->inviteUser($this);
     }
 
