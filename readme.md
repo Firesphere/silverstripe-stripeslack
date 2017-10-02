@@ -95,7 +95,8 @@ After setting up Slack, a few more steps are needed.
 
 ## Adding the form to your website
 
-On your place of choice to add the form, simply include `$SlackForm` and the form should appear.
+On the place of choice to add the form, simply include `$SlackForm` in your template at your place of choice 
+(You might want to add `$Top` if needed)and the form should appear.
 
 Textual changes can be made in a translation file in your base project. See `stripeslack\lang\en.yml` for an example.
 
@@ -110,6 +111,7 @@ The form relies completely on the provided `FormField` templates. So styling is 
 - [x] Re-try sending invites via the CMS
 - [ ] Move away from `RestfulService` (Removed in SS4) to using `Guzzle`
 - [ ] SilverStripe 4 compatible version
+- [ ] Add a shortcode to use [slackform] from the CMS
 
 # Cow?
 
@@ -150,3 +152,7 @@ Redistribution and use in source and binary forms, with or without modification,
 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### License of third party
+
+The image used for Slack in the CMS is the grayscale image provided by Slack as their official image to use. Copyright of image is with Slack Ltd.
