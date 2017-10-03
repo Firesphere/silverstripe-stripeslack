@@ -21,7 +21,7 @@ class SlackAdmin extends ModelAdmin
 
     public function getEditForm($id = null, $fields = null)
     {
-        /** @var $this|Form $form */
+        /** @var $this |Form $form */
         $form = parent::getEditForm($id, $fields);
         // Slightly pointless because it only manages 1 model, but ¯\_(ツ)_/¯
         if ($this->modelClass === 'SlackInvite') {

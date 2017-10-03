@@ -51,9 +51,9 @@ class StripeSlackSiteConfigExtension extends DataExtension
         $labels['SlackChannel'] = _t('StripeSlackSiteConfigExtension.SlackChannel', 'The ID of your channel');
         $labels['ClearSecrets'] = _t('StripeSlackSiteConfigExtension.ClearSecrets', 'Clear Secrets and Tokens');
         $labels['SlackBackURL'] = _t('StripeSlackSiteConfigExtension.SlackBackURL',
-            'URL to redirect when request is successful');
+            'URL to redirect when request is successful (leave empty if you want use the Stripe Slack Page)');
         $labels['SlackErrorBackURL'] = _t('StripeSlackSiteConfigExtension.SlackErrorBackURL',
-            'URL to redirect when request is unsuccessful');
+            'URL to redirect when request is unsuccessful (leave empty if you want to use the Stripe Slack Page)');
     }
 
     public function updateCMSFields(FieldList $fields)

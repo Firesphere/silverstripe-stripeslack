@@ -5,6 +5,7 @@ class SlackSignupForm extends Form
 {
 
     private $siteConfig;
+
     /**
      * SlackSignupForm constructor.
      * @param Controller $controller
@@ -68,6 +69,7 @@ class SlackSignupForm extends Form
         if (!$this->siteConfig->SlackToken) {
             return FieldList::create();
         }
+
         return FieldList::create([
             FormAction::create('submitSlackForm', _t('SlackSignupForm.Submit', 'Submit'))
         ]);
@@ -97,39 +99,15 @@ class SlackSignupForm extends Form
     public function redirectSlack($success)
     {
         $config = SiteConfig::current_site_config();
-        $controller = Controller::curr();
-        if ($controller instanceof ModelAdmin) {
-            // In theory, this shows a message in the CMS
-            // In practice, it seems to do nothing
-            if ($success === true) {
-                return $controller->getResponse()->setStatusCode(
-                    200,
-                    'User successfully invited.'
-                );
-            } else {
-                return $controller->getResponse()->setStatusCode(
-                    500,
-                    'Something went wrong when inviting the user.'
-                );
-            }
-        }
         if (!$success) {
             if ($config->SlackErrorBackURLID) {
                 return $this->controller->redirect($config->SlackErrorBackURL()->Link());
-            } else {
-                $this->sessionMessage(
-                    _t('SlackSignupForm.ConfigError', 'There is an error in the Slack Configuration'),
-                    'warning'
-                );
-                return $this->controller->redirectBack();
             }
+            $this->controller->redirect($this->controller->Link('error'));
         }
         if ($config->SlackBackURLID) {
             return $this->controller->redirect($config->SlackBackURL()->Link());
-        } else {
-            $this->sessionMessage(_t('SlackSignupForm.NoSuccessPage', 'An invite has been sent to your inbox'), 'good');
-            return $this->controller->redirectBack();
         }
-
+        return $this->controller->redirect($this->controller->Link('success'));
     }
 }

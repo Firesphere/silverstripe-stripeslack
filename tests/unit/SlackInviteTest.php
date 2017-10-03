@@ -15,9 +15,9 @@ class SlackInviteTest extends SapphireTest
     public function testDeleteDuplicates()
     {
         /** @var SlackInvite $user */
-        $user = $this->objFromFixture(SlackInvite::class, 'invite1');
+        $user = $this->objFromFixture('SlackInvite', 'invite1');
         $user->Invited = true;
-        $user->updateDuplicates();
+        $user->deleteDuplicates();
         /** @var DataList|SlackInvite[] $result */
         $result = SlackInvite::get()->filter(['Email' => $user->Email]);
         $this->assertEquals(1, $result->count());

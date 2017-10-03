@@ -1,12 +1,14 @@
-<phpunit bootstrap="framework/tests/bootstrap.php" colors="true">
+<phpunit printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter"
+         bootstrap="framework/tests/bootstrap.php"
+         colors="true">
 
-	<testsuite name="Default">
-		<directory>stripeslack/tests</directory>
-	</testsuite>
+    <testsuite name="Default">
+        <directory>stripeslack/tests</directory>
+    </testsuite>
 
-	<groups>
-		<exclude>
-			<group>sanitychecks</group>
-		</exclude>
-	</groups>
+    <groups>
+        <exclude>
+            <group>sanitychecks</group>
+        </exclude>
+    </groups>
 </phpunit>

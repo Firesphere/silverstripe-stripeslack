@@ -7,13 +7,20 @@
  */
 class SlackAuthControllerTest extends SapphireTest
 {
+    /**
+     * @var SlackAuthController
+     */
+    protected $controller;
+
+    public function setUp()
+    {
+        $this->controller = Injector::inst()->get('SlackAuthController');
+    }
 
     public function testGetQuery()
     {
         $config = SiteConfig::current_site_config();
-        /** @var SlackAuthController $controller */
-        $controller = Injector::inst()->get(SlackAuthController::class);
-        $result = $controller->getQuery($config, '1234567890987654321');
+        $result = $this->controller->getQuery($config, '1234567890987654321');
         $expectedArray = [
             'client_id'     => $config->SlackClientID,
             'client_secret' => $config->SlackClientSecret,
@@ -26,16 +33,13 @@ class SlackAuthControllerTest extends SapphireTest
 
     public function testSaveToken()
     {
-        /** @var SlackAuthController $controller */
-        $controller = Injector::inst()->get(SlackAuthController::class);
-        $response = new RestfulService_Response('{access_token:1234567890}');
+        $response = new RestfulService_Response('{"access_token":"12345678chdiyp67"}');
 
         $config = SiteConfig::current_site_config();
 
-        $controller->saveToken($response, $config);
+        $this->controller->saveToken($response, $config);
         $config = SiteConfig::current_site_config();
         // This seems to not work on tests?? SiteConfig seems to not write
-//        $this->assertEquals('1234567890', $config->SlackToken);
-
+        $this->assertEquals('12345678chdiyp67', $config->SlackToken);
     }
 }
