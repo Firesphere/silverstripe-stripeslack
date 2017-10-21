@@ -36,7 +36,7 @@ class StripeSlackPage extends Page
  *
  * @property StripeSlackPage dataRecord
  * @method StripeSlackPage data()
- * @mixin StripeSlackPage
+ * @mixin StripeSlackPage dataRecord
  */
 class StripeSlackPage_Controller extends Page_Controller
 {
