@@ -40,4 +40,6 @@ jobs:
       - run: framework/sake dev/build
 
       # run tests!
-      - run: vendor/bin/phpunit -d memory_limit=1G stripeslack/tests/unit
+      - run: vendor/bin/phpunit -d memory_limit=1G --coverage-clover=coverage.xml stripeslack/tests/unit
+      - run: bash <(curl -s https://codecov.io/bash) -f coverage.xml
+

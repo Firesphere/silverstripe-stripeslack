@@ -7,6 +7,7 @@
  * @property string $Name
  * @property string $Email
  * @property boolean $Invited
+ * @property string $Message
  */
 class SlackInvite extends DataObject implements PermissionProvider
 {
@@ -14,14 +15,16 @@ class SlackInvite extends DataObject implements PermissionProvider
     private static $db = [
         'Name'    => 'Varchar(255)',
         'Email'   => 'Varchar(255)',
-        'Invited' => 'Boolean(false)'
+        'Invited' => 'Boolean(false)',
+        'Message' => 'Varchar(255)',
     ];
 
     private static $summary_fields = [
         'Created',
         'Name',
         'Email',
-        'Invited.Nice'
+        'Invited.Nice',
+        'Message'
     ];
 
     private static $field_labels = [
@@ -31,6 +34,18 @@ class SlackInvite extends DataObject implements PermissionProvider
         'Invited.Nice' => 'Invite successful'
     ];
 
+    private static $messages = [
+        'not_authed' => 'No valid Slack Token provided, please check your settings',
+        'already_invited' => 'User has already received an email invitation',
+        'already_in_team' => 'User is already part of the team',
+        'channel_not_found' => 'Provided channel ID does not match an existing channel in your workspace',
+        'sent_recently' => 'When using resend=true, the email has been sent recently already',
+        'user_disabled' => 'User account has been deactivated',
+        'missing_scope' => 'Using an access_token not authorized for "client" scope',
+        'invalid_email' => 'Invalid email address (e.g. "qwe"). Note that Slack does not recognize some email addresses even though they are technically valid. This is a known issue.',
+        'not_allowed' => 'When SSO is enabeld this method can not be used to invite new users except guests. The SCIM API needs to be used instead to invite new users. '
+    ];
+
     private static $better_buttons_actions = [
         'resendInvite'
     ];
@@ -38,6 +53,7 @@ class SlackInvite extends DataObject implements PermissionProvider
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->removeByName(['Invited']);
         if (!$this->Invited) {
             $fields->addFieldToTab(
                 'Root.Main',
@@ -47,6 +63,8 @@ class SlackInvite extends DataObject implements PermissionProvider
                 )
             );
         }
+        $fields->addFieldToTab('Root.Main', ReadonlyField::create('Message', 'API Message'));
+        $fields->addFieldToTab('Root.Main', ReadonlyField::create('InvitedStatus', 'Invite successful', $this->dbObject('Invited')->Nice()));
 
         return $fields;
     }
@@ -55,28 +73,32 @@ class SlackInvite extends DataObject implements PermissionProvider
      * If BetterButtons is installed, add a button to resend or retry
      * @return mixed
      */
-    public function getBetterButtonsActions() {
+    public function getBetterButtonsActions()
+    {
         $fields = parent::getBetterButtonsActions();
-        if($this->Invited) {
+        if ($this->Invited) {
             $fields->push(BetterButtonCustomAction::create('resendInvite', 'Resend')
                 ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
-        }
-        else {
+        } else {
             $fields->push(BetterButtonCustomAction::create('resendInvite', 'Retry')
                 ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         }
+
         return $fields;
     }
 
     /**
      * If the user isn't invited yet, send out the invite
+     * @throws \ValidationException
      */
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if (!$this->Invited) {
+        // Only attempt to send when there is no ID
+        // This prevents retrying from the CMS from ending up in an endless loop
+        if (!$this->ID) {
             $this->inviteUser();
         }
     }
@@ -121,6 +143,8 @@ class SlackInvite extends DataObject implements PermissionProvider
     /**
      * @param SiteConfig $config
      * @param array $params
+     * @return bool|$this
+     * @throws \ValidationException
      */
     private function doRequestEmail($config, $params)
     {
@@ -130,29 +154,43 @@ class SlackInvite extends DataObject implements PermissionProvider
         $response = $service->request('/api/users.admin.invite?t=' . $now, 'POST', $params);
         $result = Convert::json2array($response->getBody());
 
-        if (isset($result['error']) && $result['error'] === 'already_invited') {
-            $this->Invited = true;
+        if (isset($result['error'])) {
+            /** @noinspection PhpParamsInspection */
+            SS_Log::log($result['error'], SS_Log::ERR);
+            $this->Message = static::$messages[$result['error']];
+
+            if ($result['error'] === 'already_invited' || $result['error'] === 'already_in_team') {
+                $this->Message .= '; Invite successful';
+                $this->Invited = true;
+            }
         } else {
+            $this->Message = 'Invite successful';
             $this->Invited = (bool)$result['ok'];
         }
 
         if ($this->Invited) {
-            $this->updateDuplicates();
+            $this->deleteDuplicates();
         }
 
+        $isModelAdmin = Controller::curr() instanceof ModelAdmin;
         /*
          * Only write here if we're in the CMS, don't write if the invite failed
          * As that will cause a possible infinite loop
          */
-        if ($this->Invited && Controller::curr() instanceof ModelAdmin) {
+        if ((bool)$this->Invited === true && $isModelAdmin) {
             $this->write();
+            return $this->Message;
+        } elseif ($isModelAdmin) {
+            return $this->Message;
         }
+
+        return $this;
     }
 
     /**
-     * @throws \ValidationException
+     * Remove duplicates after a successful invite
      */
-    public function updateDuplicates()
+    public function deleteDuplicates()
     {
         /** @var DataList|SlackInvite[] $thisDuplicates */
         $thisDuplicates = static::get()
@@ -173,7 +211,7 @@ class SlackInvite extends DataObject implements PermissionProvider
     {
         // Resend the invite. If the user has been invited before it should re-send
         // The instance is needed so we know if we should write inside the `inviteUser` method
-        $this->inviteUser((bool)$this->Invited, Controller::curr() instanceof ModelAdmin);
+        $this->inviteUser((bool)$this->Invited);
     }
 
     /**
@@ -187,18 +225,21 @@ class SlackInvite extends DataObject implements PermissionProvider
             'EDIT_SLACKINVITE'   => [
                 'name'     => _t('SlackInvite.PERMISSION_EDIT_DESCRIPTION', 'Edit Slack invites'),
                 'category' => _t('Permissions.SLACK_SLACKINVITE', 'Slack permissions'),
-                'help'     => _t('SlackInvite.PERMISSION_EDIT_HELP', 'Permission required to edit existing Slack invites.')
+                'help'     => _t('SlackInvite.PERMISSION_EDIT_HELP',
+                    'Permission required to edit existing Slack invites.')
             ],
             'DELETE_SLACKINVITE' => [
                 'name'     => _t('SlackInvite.PERMISSION_DELETE_DESCRIPTION', 'Delete Slack invites'),
                 'category' => _t('Permissions.SLACK_SLACKINVITE', 'Slack permissions'),
-                'help'     => _t('SlackInvite.PERMISSION_DELETE_HELP', 'Permission required to delete existing Slack invites.'
+                'help'     => _t('SlackInvite.PERMISSION_DELETE_HELP',
+                    'Permission required to delete existing Slack invites.'
                 )
             ],
             'VIEW_SLACKINVITE'   => [
                 'name'     => _t('SlackInvite.PERMISSION_VIEW_DESCRIPTION', 'View Slack invites'),
                 'category' => _t('Permissions.SLACK_SLACKINVITE', 'Slack permissions'),
-                'help'     => _t('SlackInvite.PERMISSION_VIEW_HELP', 'Permission required to view existing Slack invites.')
+                'help'     => _t('SlackInvite.PERMISSION_VIEW_HELP',
+                    'Permission required to view existing Slack invites.')
             ],
         ];
     }

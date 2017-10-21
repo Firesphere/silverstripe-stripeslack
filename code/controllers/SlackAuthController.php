@@ -56,6 +56,7 @@ class SlackAuthController extends Controller
     /**
      * @param RestfulService_Response $response
      * @param SiteConfig $config
+     * @throws \ValidationException
      */
     public function saveToken($response, $config)
     {
