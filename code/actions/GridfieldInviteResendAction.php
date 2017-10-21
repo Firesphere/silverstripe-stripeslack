@@ -71,6 +71,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
                     ->setAttribute('data-icon', 'arrow-circle-double')
                     ->setDescription('Resend invite');
             }
+
             return $field->Field();
         }
 
@@ -100,7 +101,18 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
                 return;
             }
 
-            return $item->resendInvite();
+            $result = $item->resendInvite();
+            if ($result === true) {
+                Controller::curr()->getResponse()->setStatusCode(
+                    200,
+                    'User successfully invited.'
+                );
+            } else {
+                Controller::curr()->getResponse()->setStatusCode(
+                    200,
+                    $result
+                );
+            }
         }
     }
 

@@ -2,7 +2,11 @@
   "name": "firesphere/stripeslack",
   "description": "Easy invite new users to your slack group",
   "type": "silverstripe-module",
-  "keywords": ["silverstripe", "slack", "invite"],
+  "keywords": [
+    "silverstripe",
+    "slack",
+    "invite"
+  ],
   "license": "BSD-3-Clause",
   "authors": [
     {
@@ -12,8 +16,7 @@
       "role": "Developer"
     }
   ],
-  "require":
-  {
+  "require": {
     "silverstripe/framework": "~3.1",
     "silverstripe/cms": "~3.1"
   },

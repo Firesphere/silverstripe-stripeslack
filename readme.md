@@ -95,8 +95,10 @@ After setting up Slack, a few more steps are needed.
 
 ## Adding the form to your website
 
-On the place of choice to add the form, simply include `$SlackForm` in your template at your place of choice 
-(You might want to add `$Top` if needed)and the form should appear.
+You can create a StripeSlackPage type, which will help you set up everything. It allows you to set the success and error message as well.
+
+If you want to place the signup-form in the footer for example, you can, at the place of choice to add the form, 
+simply include `$SlackForm` in your template (You might need to add `$Top` if needed) and the form should appear.
 
 Textual changes can be made in a translation file in your base project. See `stripeslack\lang\en.yml` for an example.
 
@@ -106,12 +108,12 @@ The form relies completely on the provided `FormField` templates. So styling is 
 
 ## Todo
 
-- [ ] Add tests
+- [|] Add tests
 - [ ] Make invites sent to a certain channel
 - [x] Re-try sending invites via the CMS
 - [ ] Move away from `RestfulService` (Removed in SS4) to using `Guzzle`
 - [ ] SilverStripe 4 compatible version
-- [ ] Add a shortcode to use [slackform] from the CMS
+- [x] Add a shortcode to use [slackform] from the CMS
 
 # Cow?
 
