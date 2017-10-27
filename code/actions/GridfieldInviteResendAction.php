@@ -56,7 +56,11 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
         if ($config->SlackToken) {
             if (!$record->Invited) {
                 $field = GridField_FormAction::create(
-                    $gridField, 'Retry' . $record->ID, false, 'resend', ['RecordID' => $record->ID]
+                    $gridField,
+                    'Retry' . $record->ID,
+                    false,
+                    'resend',
+                    ['RecordID' => $record->ID]
                 )
                     ->addExtraClass('gridfield-button-resend')
                     ->setAttribute('title', 'Retry invite')
@@ -64,7 +68,11 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
                     ->setDescription(_t('GridfieldInviteResendAction.Resend', 'Retry failed invitation'));
             } else {
                 $field = GridField_FormAction::create(
-                    $gridField, 'Resend', false, 'resend', ['RecordID' => $record->ID]
+                    $gridField,
+                    'Resend',
+                    false,
+                    'resend',
+                    ['RecordID' => $record->ID]
                 )
                     ->addExtraClass('gridfield-button-resend')
                     ->setAttribute('title', 'Resend invite')
@@ -74,7 +82,6 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
 
             return $field->Field();
         }
-
     }
 
     /**
@@ -115,5 +122,4 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
             }
         }
     }
-
 }

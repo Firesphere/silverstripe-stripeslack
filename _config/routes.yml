@@ -4,3 +4,4 @@ Name: stripeslackroutes
 Director:
   rules:
     'SlackAuthorization': SlackAuthController
+    'SlackStatus//$Action/$ID/$OtherID': SlackStatusController

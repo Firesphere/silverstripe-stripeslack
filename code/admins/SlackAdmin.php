@@ -7,7 +7,6 @@
  */
 class SlackAdmin extends ModelAdmin
 {
-
     private static $managed_models = [
         'SlackInvite'
     ];
