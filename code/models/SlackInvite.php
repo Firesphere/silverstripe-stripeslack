@@ -11,7 +11,6 @@
  */
 class SlackInvite extends DataObject implements PermissionProvider
 {
-
     private static $db = [
         'Name'    => 'Varchar(255)',
         'Email'   => 'Varchar(255)',
@@ -35,15 +34,15 @@ class SlackInvite extends DataObject implements PermissionProvider
     ];
 
     private static $messages = [
-        'not_authed' => 'No valid Slack Token provided, please check your settings',
-        'already_invited' => 'User has already received an email invitation',
-        'already_in_team' => 'User is already part of the team',
+        'not_authed'        => 'No valid Slack Token provided, please check your settings',
+        'already_invited'   => 'User has already received an email invitation',
+        'already_in_team'   => 'User is already part of the team',
         'channel_not_found' => 'Provided channel ID does not match an existing channel in your workspace',
-        'sent_recently' => 'When using resend=true, the email has been sent recently already',
-        'user_disabled' => 'User account has been deactivated',
-        'missing_scope' => 'Using an access_token not authorized for "client" scope',
-        'invalid_email' => 'Invalid email address (e.g. "qwe"). Note that Slack does not recognize some email addresses even though they are technically valid. This is a known issue.',
-        'not_allowed' => 'When SSO is enabeld this method can not be used to invite new users except guests. The SCIM API needs to be used instead to invite new users. '
+        'sent_recently'     => 'When using resend=true, the email has been sent recently already',
+        'user_disabled'     => 'User account has been deactivated',
+        'missing_scope'     => 'Using an access_token not authorized for "client" scope',
+        'invalid_email'     => 'Invalid email address (e.g. "qwe"). Note that Slack does not recognize some email addresses even though they are technically valid. This is a known issue.',
+        'not_allowed'       => 'When SSO is enabeld this method can not be used to invite new users except guests. The SCIM API needs to be used instead to invite new users. '
     ];
 
     private static $better_buttons_actions = [
@@ -64,7 +63,10 @@ class SlackInvite extends DataObject implements PermissionProvider
             );
         }
         $fields->addFieldToTab('Root.Main', ReadonlyField::create('Message', 'API Message'));
-        $fields->addFieldToTab('Root.Main', ReadonlyField::create('InvitedStatus', 'Invite successful', $this->dbObject('Invited')->Nice()));
+        $fields->addFieldToTab(
+            'Root.Main',
+            ReadonlyField::create('InvitedStatus', 'Invite successful', $this->dbObject('Invited')->Nice())
+        );
 
         return $fields;
     }
@@ -77,11 +79,13 @@ class SlackInvite extends DataObject implements PermissionProvider
     {
         $fields = parent::getBetterButtonsActions();
         if ($this->Invited) {
-            $fields->push(BetterButtonCustomAction::create('resendInvite', 'Resend')
+            $fields->push(
+                BetterButtonCustomAction::create('resendInvite', 'Resend')
                 ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         } else {
-            $fields->push(BetterButtonCustomAction::create('resendInvite', 'Retry')
+            $fields->push(
+                BetterButtonCustomAction::create('resendInvite', 'Retry')
                 ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         }
@@ -91,7 +95,7 @@ class SlackInvite extends DataObject implements PermissionProvider
 
     /**
      * If the user isn't invited yet, send out the invite
-     * @throws \ValidationException
+     * @throws ValidationException
      */
     public function onBeforeWrite()
     {
@@ -108,7 +112,7 @@ class SlackInvite extends DataObject implements PermissionProvider
      * This method is public, so it can be addressed from the CMS.
      *
      * @param bool $resend
-     * @throws \ValidationException
+     * @throws ValidationException
      */
     public function inviteUser($resend = false)
     {
@@ -179,6 +183,7 @@ class SlackInvite extends DataObject implements PermissionProvider
          */
         if ((bool)$this->Invited === true && $isModelAdmin) {
             $this->write();
+
             return $this->Message;
         } elseif ($isModelAdmin) {
             return $this->Message;
@@ -205,7 +210,7 @@ class SlackInvite extends DataObject implements PermissionProvider
 
     /**
      * Re-send this invite
-     * @throws \ValidationException
+     * @throws ValidationException
      */
     public function resendInvite()
     {
@@ -225,21 +230,26 @@ class SlackInvite extends DataObject implements PermissionProvider
             'EDIT_SLACKINVITE'   => [
                 'name'     => _t('SlackInvite.PERMISSION_EDIT_DESCRIPTION', 'Edit Slack invites'),
                 'category' => _t('Permissions.SLACK_SLACKINVITE', 'Slack permissions'),
-                'help'     => _t('SlackInvite.PERMISSION_EDIT_HELP',
-                    'Permission required to edit existing Slack invites.')
+                'help'     => _t(
+                    'SlackInvite.PERMISSION_EDIT_HELP',
+                    'Permission required to edit existing Slack invites.'
+                )
             ],
             'DELETE_SLACKINVITE' => [
                 'name'     => _t('SlackInvite.PERMISSION_DELETE_DESCRIPTION', 'Delete Slack invites'),
                 'category' => _t('Permissions.SLACK_SLACKINVITE', 'Slack permissions'),
-                'help'     => _t('SlackInvite.PERMISSION_DELETE_HELP',
+                'help'     => _t(
+                    'SlackInvite.PERMISSION_DELETE_HELP',
                     'Permission required to delete existing Slack invites.'
                 )
             ],
             'VIEW_SLACKINVITE'   => [
                 'name'     => _t('SlackInvite.PERMISSION_VIEW_DESCRIPTION', 'View Slack invites'),
                 'category' => _t('Permissions.SLACK_SLACKINVITE', 'Slack permissions'),
-                'help'     => _t('SlackInvite.PERMISSION_VIEW_HELP',
-                    'Permission required to view existing Slack invites.')
+                'help'     => _t(
+                    'SlackInvite.PERMISSION_VIEW_HELP',
+                    'Permission required to view existing Slack invites.'
+                )
             ],
         ];
     }
@@ -278,5 +288,4 @@ class SlackInvite extends DataObject implements PermissionProvider
     {
         return Permission::checkMember($member, array('VIEW_SLACKINVITE', 'CMS_ACCESS_SlackInviteAdmin'));
     }
-
 }

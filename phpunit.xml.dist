@@ -1,10 +1,13 @@
-<phpunit printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter"
-         bootstrap="framework/tests/bootstrap.php"
-         colors="true">
+<phpunit bootstrap="framework/tests/bootstrap.php" colors="true">
 
     <testsuite name="Default">
         <directory>stripeslack/tests</directory>
     </testsuite>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">stripeslack/code</directory>
+        </whitelist>
+    </filter>
 
     <groups>
         <exclude>

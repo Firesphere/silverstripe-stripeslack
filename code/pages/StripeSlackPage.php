@@ -2,7 +2,7 @@
 
 /**
  * Class StripeSlackPage
- * 
+ *
  * This page does not have a unit test, as it's such a basic pagetype
  *
  * @property string $Success
@@ -10,12 +10,11 @@
  */
 class StripeSlackPage extends Page
 {
-
     private static $description = 'Slack signup page';
 
     private static $db = [
         'Success' => 'HTMLText',
-        'Error' => 'HTMLText'
+        'Error'   => 'HTMLText'
     ];
 
     public function getCMSFields()
@@ -28,7 +27,6 @@ class StripeSlackPage extends Page
 
         return $fields;
     }
-
 }
 
 /**
@@ -40,7 +38,6 @@ class StripeSlackPage extends Page
  */
 class StripeSlackPage_Controller extends Page_Controller
 {
-
     private static $allowed_actions = [
         'SlackSignupForm',
         'success',

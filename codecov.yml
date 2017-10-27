@@ -5,3 +5,5 @@ ignore: # Ignoring irrelevant code. Default SS stuff should not be called out by
   - "code/admins"
   - "code/extensions"
   - "code/forms"
+  - "code/models"
+  - "framework"
