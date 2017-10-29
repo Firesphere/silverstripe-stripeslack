@@ -1,5 +1,15 @@
 <?php
 
+namespace Firesphere\StripeSlack\Test;
+
+use Firesphere\StripeSlack\Controller\SlackStatusController;
+use Firesphere\StripeSlack\Model\SlackUserCount;
+use GuzzleHttp\Client;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\DataList;
+use SilverStripe\SiteConfig\SiteConfig;
+
 class SlackStatusControllerTest extends SapphireTest
 {
     protected static $fixture_file = '../fixtures/count.yml';
@@ -27,7 +37,7 @@ class SlackStatusControllerTest extends SapphireTest
 
     public function testInvalidConfig()
     {
-        $controller = SlackStatusController::create(new SS_HTTPRequest('GET', '/SlackStatus/usercount'));
+        $controller = SlackStatusController::create(new HTTPRequest('GET', '/SlackStatus/usercount'));
         $config = SiteConfig::current_site_config();
         $config->SlackURL = '';
         $config->write();
@@ -50,14 +60,14 @@ class SlackStatusControllerTest extends SapphireTest
      */
     public function testGetSVGSettings($expected, $amount)
     {
-        $controller = SlackStatusController::create(new SS_HTTPRequest('GET', '/SlackStatus/usercount'));
+        $controller = SlackStatusController::create(new HTTPRequest('GET', '/SlackStatus/usercount'));
         $result = $controller->getSVGSettings($amount);
         $this->assertEquals($expected, $result);
     }
 
     public function testCachedStatus()
     {
-        $controller = SlackStatusController::create(new SS_HTTPRequest('GET', '/SlackStatus/usercount'));
+        $controller = SlackStatusController::create(new HTTPRequest('GET', '/SlackStatus/usercount'));
         $this->assertEquals(10, $controller->getStatus(SiteConfig::current_site_config()));
     }
 
@@ -68,7 +78,7 @@ class SlackStatusControllerTest extends SapphireTest
      */
     public function testSVG($expected, $amount)
     {
-        $controller = SlackStatusController::create(new SS_HTTPRequest('GET', '/SlackStatus/badge'));
+        $controller = SlackStatusController::create(new HTTPRequest('GET', '/SlackStatus/badge'));
 
         $counter = SlackUserCount::get()->first();
         $counter->UserCount = $amount;
@@ -93,10 +103,8 @@ class SlackStatusControllerTest extends SapphireTest
     {
         /** @var SlackStatusController $controller */
         $controller = SlackStatusController::create();
-        $result = $controller->getRestfulService(SiteConfig::current_site_config());
-        $this->assertTrue(is_array($result));
-        $this->assertContains('api/channels.info', $result[0]);
-        $this->assertInstanceOf('RestfulService', $result[1]);
+        $result = $controller->getClient(SiteConfig::current_site_config());
+        $this->assertInstanceOf(Client::class, $result);
     }
 
     public function testValidateResponse()

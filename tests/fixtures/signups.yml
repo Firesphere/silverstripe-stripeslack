@@ -1,4 +1,4 @@
-SlackInvite:
+Firesphere\StripeSlack\Model\SlackInvite:
   invite1:
     Name: Testuser
     Email: test@silverstripe.com

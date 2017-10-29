@@ -1,5 +1,15 @@
 <?php
 
+namespace Firesphere\StripeSlack\Controller;
+
+use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\ORM\ValidationException;
 
 /**
  * Class SlackAuthController
@@ -12,18 +22,18 @@ class SlackAuthController extends Controller
      * It seems like a lot is going on here
      * But in reality, it's mainly just configuration stuff
      *
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
+     * @throws ValidationException
      */
-    public function index(SS_HTTPRequest $request)
+    public function index(HTTPRequest $request)
     {
         list($code, $config, $baseURL, $url) = $this->getConfig($request);
 
         $query = $this->getQuery($config, $code);
 
         // Setup and request the code
-        // @todo rewrite to Guzzle for SS4
-        $service = RestfulService::create($baseURL, 'GET', null, 0);
-        $response = $service->request($url . $query);
+        $service = new Client(['base_uri' => $baseURL]);
+        $response = $service->request('GET', $url . $query);
 
         $this->saveToken($response, $config);
 
@@ -49,9 +59,9 @@ class SlackAuthController extends Controller
     }
 
     /**
-     * @param RestfulService_Response $response
+     * @param ResponseInterface $response
      * @param SiteConfig $config
-     * @throws \ValidationException
+     * @throws ValidationException
      */
     public function saveToken($response, $config)
     {
@@ -63,10 +73,10 @@ class SlackAuthController extends Controller
     }
 
     /**
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
      * @return array
      */
-    public function getConfig(SS_HTTPRequest $request)
+    public function getConfig(HTTPRequest $request)
     {
         // Code param
         $code = $request->getVar('code');

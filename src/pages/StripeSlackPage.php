@@ -1,5 +1,10 @@
 <?php
 
+namespace Firesphere\StripeSlack\Page;
+
+use Page;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+
 /**
  * Class StripeSlackPage
  *
@@ -17,6 +22,8 @@ class StripeSlackPage extends Page
         'Error'   => 'HTMLText'
     ];
 
+    private static $table_name = 'StripeSlackPage';
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -26,36 +33,5 @@ class StripeSlackPage extends Page
         ]);
 
         return $fields;
-    }
-}
-
-/**
- * Class StripeSlackPage_Controller
- *
- * @property StripeSlackPage dataRecord
- * @method StripeSlackPage data()
- * @mixin StripeSlackPage dataRecord
- */
-class StripeSlackPage_Controller extends Page_Controller
-{
-    private static $allowed_actions = [
-        'SlackSignupForm',
-        'success',
-        'oops'
-    ];
-
-    public function SlackSignupForm()
-    {
-        return SlackSignupForm::create($this, __FUNCTION__);
-    }
-
-    public function success()
-    {
-        return $this;
-    }
-
-    public function oops()
-    {
-        return $this;
     }
 }

@@ -1,6 +1,6 @@
-SiteConfig:
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - StripeSlackSiteConfigExtension
-ContentController:
+    - Firesphere\StripeSlack\Extension\SiteConfigExtension
+SilverStripe\CMS\Controllers\ContentController:
   extensions:
-    - SlackControllerExtension
+    - Firesphere\StripeSlack\Extension\ControllerExtension

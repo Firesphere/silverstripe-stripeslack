@@ -1,5 +1,17 @@
 <?php
 
+namespace Firesphere\StripeSlack\Form;
+
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\EmailField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\SiteConfig\SiteConfig;
+use Firesphere\StripeSlack\Model\SlackInvite;
 
 class SlackSignupForm extends Form
 {
@@ -97,7 +109,7 @@ class SlackSignupForm extends Form
      * Plus a check if the URL's are set on the config.
      *
      * @param boolean $success
-     * @return bool|SS_HTTPResponse
+     * @return bool|HTTPResponse
      */
     public function redirectSlack($success)
     {

@@ -1,7 +1,7 @@
 {
   "name": "firesphere/stripeslack",
   "description": "Easy invite new users to your slack group",
-  "type": "silverstripe-module",
+  "type": "silverstripe-vendormodule",
   "keywords": [
     "silverstripe",
     "slack",
@@ -17,18 +17,25 @@
     }
   ],
   "require": {
-    "silverstripe/framework": "~3.1",
-    "silverstripe/cms": "~3.1"
+    "silverstripe/recipe-cms": "1.x-dev",
+    "guzzlehttp/guzzle": "~6.0"
   },
   "require-dev": {
-    "phpunit/PHPUnit": "^5.7",
     "scriptfusion/phpunit-immediate-exception-printer": "^2.0"
   },
-  "extra": {
-    "installer-name": "stripeslack",
-    "branch-alias": {
-      "dev-master": "1.x-dev"
+  "autoload": {
+    "psr-4": {
+      "Firesphere\\StripeSlack\\Form\\": "src/forms",
+      "Firesphere\\StripeSlack\\Page\\": "src/pages",
+      "Firesphere\\StripeSlack\\Admin\\": "src/admins",
+      "Firesphere\\StripeSlack\\Parser\\": "src/shortcodes",
+      "Firesphere\\StripeSlack\\Extension\\": "src/extensions",
+      "Firesphere\\StripeSlack\\Controller\\": "src/controllers"
     }
   },
-  "target-dir": "stripeslack"
+  "extra": {
+    "installer-name": "stripeslack"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

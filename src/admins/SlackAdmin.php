@@ -1,5 +1,10 @@
 <?php
 
+namespace Firesphere\StripeSlack\Admin;
+
+use Firesphere\StripeSlack\Actions\GridfieldInviteResendAction;
+use Firesphere\StripeSlack\Model\SlackInvite;
+use SilverStripe\Admin\ModelAdmin;
 
 /**
  * Class SlackAdmin
@@ -8,14 +13,14 @@
 class SlackAdmin extends ModelAdmin
 {
     private static $managed_models = [
-        'SlackInvite'
+        SlackInvite::class
     ];
 
     private static $url_segment = 'SlackInvite';
 
     private static $menu_title = 'Slack Invites';
 
-    private static $menu_icon = '/stripeslack/img/slack_logo.png';
+    private static $menu_icon = 'stripeslack/img/slack_logo.png';
 
 
     public function getEditForm($id = null, $fields = null)

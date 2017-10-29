@@ -1,3 +1,10 @@
+# Badger Badger Badger, Mushroom Mushroom!
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Firesphere/silverstripe-stripeslack/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Firesphere/silverstripe-stripeslack/?branch=master)
+[![codecov](https://codecov.io/gh/Firesphere/silverstripe-stripeslack/branch/master/graph/badge.svg)](https://codecov.io/gh/Firesphere/silverstripe-stripeslack)
+[![CircleCI](https://circleci.com/gh/Firesphere/silverstripe-stripeslack/tree/master.svg?style=svg)](https://circleci.com/gh/Firesphere/silverstripe-stripeslack/tree/master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/0cb79fe7bfa3c2bc39f0/maintainability)](https://codeclimate.com/github/Firesphere/silverstripe-stripeslack/maintainability)
+
+
 # StripeSlack
 
 Inviting users to your public Slack channel is pretty hard to automate.

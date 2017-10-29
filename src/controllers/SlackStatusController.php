@@ -1,5 +1,15 @@
 <?php
 
+namespace Firesphere\StripeSlack\Controller;
+
+use Firesphere\StripeSlack\Model\SlackUserCount;
+use GuzzleHttp\Client;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class SlackStatusController
@@ -30,7 +40,7 @@ class SlackStatusController extends Controller
     }
 
     /**
-     * @return SS_HTTPResponse
+     * @return HTTPResponse
      * @throws ValidationException
      */
     public function badge()
@@ -41,7 +51,7 @@ class SlackStatusController extends Controller
         list($width, $pos) = $this->getSVGSettings($count);
 
         $body = $this->renderWith('SVGTemplate', ['Count' => $count, 'Width' => $width, 'Pos' => $pos]);
-        $response = new SS_HTTPResponse($body);
+        $response = new HTTPResponse($body);
         $response->addHeader('Content-Type', 'image/svg+xml');
 
         return $response;
@@ -51,10 +61,12 @@ class SlackStatusController extends Controller
     protected function getRequestParams($config)
     {
         return [
-            'token'   => $config->SlackToken,
-            'type'    => 'post',
-            'channel' => $config->SlackChannel,
-            'scope'   => 'identify,read,post,client',
+            'form_params' => [
+                'token'   => $config->SlackToken,
+                'type'    => 'post',
+                'channel' => $config->SlackChannel,
+                'scope'   => 'identify,read,post,client',
+            ]
         ];
     }
 
@@ -71,7 +83,7 @@ class SlackStatusController extends Controller
         // To limit the amount of API requests, only update the count
         // once every 3 hours
         if ($count) {
-            $dateTime = SS_Datetime::create();
+            $dateTime = DBDatetime::create();
             $dateTime->setValue($count->LastEdited);
             $diff = explode(' ', $dateTime->TimeDiffIn('hours'));
             if ($diff[0] < 3) {
@@ -89,13 +101,14 @@ class SlackStatusController extends Controller
      * @param array $params
      * @param SlackUserCount $count
      * @return int
-     * @throws \ValidationException
+     * @throws ValidationException
      */
     protected function getSlackCount($config, $params, $count)
     {
-        list($url, $service) = $this->getRestfulService($config);
+        $service = $this->getClient($config);
+        $url = 'api/channels.info?t=' . time();
 
-        $response = $service->request($url, 'POST', $params);
+        $response = $service->request('POST', $url, $params);
         $result = Convert::json2array($response->getBody());
 
         return $this->validateResponse($count, $result);
@@ -123,19 +136,14 @@ class SlackStatusController extends Controller
 
     /**
      * @param $config
-     * @return array
+     * @return Client
      */
-    public function getRestfulService($config)
+    public function getClient($config)
     {
-        $now = time();
         $baseURL = $config->SlackURL;
         $baseURL = (substr($baseURL, -1) === '/') ? $baseURL : $baseURL . '/';
-        $url = 'api/channels.info?t=' . $now;
 
-        /** @var RestfulService $service with an _uncached_ response */
-        $service = RestfulService::create($baseURL, 0);
-
-        return array($url, $service);
+        return new Client(['base_uri' => $baseURL]);
     }
 
     /**
