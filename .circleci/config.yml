@@ -32,7 +32,7 @@ jobs:
       # Install additional requirements
 
       - run: composer create-project silverstripe/installer:~3 ~/var/www -n
-      - run: composer require firesphere/stripeslack:dev-master
+      - run: composer require firesphere/stripeslack:dev-feature/badge
       - run: composer update -n --prefer-dist
       - run: rm phpunit.xml.dist
       - run: cp stripeslack/phpunit.xml.dist .
@@ -40,6 +40,5 @@ jobs:
       - run: framework/sake dev/build
 
       # run tests!
-      - run: vendor/bin/phpunit -d memory_limit=1G --coverage-clover=coverage.xml stripeslack/tests/unit
+      - run: vendor/bin/phpunit -d memory_limit=1G --coverage-clover=coverage.xml stripeslack/tests
       - run: bash <(curl -s https://codecov.io/bash) -f coverage.xml
-

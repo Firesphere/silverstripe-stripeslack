@@ -16,13 +16,8 @@ class SlackAuthController extends Controller
      */
     public function index(SS_HTTPRequest $request)
     {
-        // Code param
-        $code = $request->getVar('code');
-        $config = SiteConfig::current_site_config();
-        // Build the URL
-        $baseURL = $config->SlackURL;
-        $baseURL = (substr($baseURL, -1) === '/') ? substr($baseURL, 0, -1) : $baseURL;
-        $url = 'api/oauth.access?';
+        list($code, $config, $baseURL, $url) = $this->getConfig($request);
+
         $query = $this->getQuery($config, $code);
 
         // Setup and request the code
@@ -65,5 +60,22 @@ class SlackAuthController extends Controller
 
         $config->SlackToken = $result['access_token'];
         $config->write();
+    }
+
+    /**
+     * @param SS_HTTPRequest $request
+     * @return array
+     */
+    public function getConfig(SS_HTTPRequest $request)
+    {
+        // Code param
+        $code = $request->getVar('code');
+        $config = SiteConfig::current_site_config();
+        // Build the URL
+        $baseURL = $config->SlackURL;
+        $baseURL = (substr($baseURL, -1) === '/') ? $baseURL : $baseURL . '/';
+        $url = 'api/oauth.access?';
+
+        return array($code, $config, $baseURL, $url);
     }
 }

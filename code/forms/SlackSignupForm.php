@@ -3,7 +3,6 @@
 
 class SlackSignupForm extends Form
 {
-
     private $siteConfig;
 
     /**
@@ -42,14 +41,18 @@ class SlackSignupForm extends Form
     {
         if (!$this->siteConfig->SlackToken) {
             return FieldList::create([
-                LiteralField::create('Setup',
-                    _t('SlackSignupForm.Setup', 'StripeSlack has not yet been configured correctly'))
+                LiteralField::create(
+                    'Setup',
+                    _t('SlackSignupForm.Setup', 'StripeSlack has not yet been configured correctly')
+                )
             ]);
         }
         $fields = FieldList::create(
             [
-                LiteralField::create('Intro',
-                    _t('SlackSignupForm.Intro', 'Fill out the form below to request access to Slack')),
+                LiteralField::create(
+                    'Intro',
+                    _t('SlackSignupForm.Intro', 'Fill out the form below to request access to Slack')
+                ),
                 TextField::create('Name', _t('SlackSignupForm.Name', 'My name is')),
                 EmailField::create('Email', _t('SlackSignupForm.Email', 'My email address is'))
                     ->setAttribute('required', true),
@@ -108,6 +111,7 @@ class SlackSignupForm extends Form
         if ($config->SlackBackURLID) {
             return $this->controller->redirect($config->SlackBackURL()->Link());
         }
+
         return $this->controller->redirect($this->controller->Link('success'));
     }
 }
