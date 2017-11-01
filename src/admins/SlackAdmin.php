@@ -20,7 +20,7 @@ class SlackAdmin extends ModelAdmin
 
     private static $menu_title = 'Slack Invites';
 
-    private static $menu_icon = 'stripeslack/img/slack_logo.png';
+    private static $menu_icon = 'firesphere/stripeslack: dist/img/slack_logo.png';
 
 
     public function getEditForm($id = null, $fields = null)

@@ -34,7 +34,10 @@
     }
   },
   "extra": {
-    "installer-name": "stripeslack"
+    "installer-name": "stripeslack",
+    "expose": [
+      "client/dist"
+    ]
   },
   "minimum-stability": "dev",
   "prefer-stable": true
