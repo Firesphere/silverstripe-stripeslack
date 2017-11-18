@@ -7,7 +7,7 @@
     "slack",
     "invite"
   ],
-  "license": "BSD-3-Clause",
+  "license": "gpl-3.0",
   "authors": [
     {
       "name": "Simon 'Sphere' Erkelens",
