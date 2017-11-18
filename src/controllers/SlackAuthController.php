@@ -8,8 +8,8 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Convert;
-use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class SlackAuthController
@@ -42,6 +42,23 @@ class SlackAuthController extends Controller
     }
 
     /**
+     * @param HTTPRequest $request
+     * @return array
+     */
+    public function getConfig(HTTPRequest $request)
+    {
+        // Code param
+        $code = $request->getVar('code');
+        $config = SiteConfig::current_site_config();
+        // Build the URL
+        $baseURL = $config->SlackURL;
+        $baseURL = (substr($baseURL, -1) === '/') ? $baseURL : $baseURL . '/';
+        $url = 'api/oauth.access?';
+
+        return [$code, $config, $baseURL, $url];
+    }
+
+    /**
      * @param $config
      * @param $code
      * @return string
@@ -70,22 +87,5 @@ class SlackAuthController extends Controller
 
         $config->SlackToken = $result['access_token'];
         $config->write();
-    }
-
-    /**
-     * @param HTTPRequest $request
-     * @return array
-     */
-    public function getConfig(HTTPRequest $request)
-    {
-        // Code param
-        $code = $request->getVar('code');
-        $config = SiteConfig::current_site_config();
-        // Build the URL
-        $baseURL = $config->SlackURL;
-        $baseURL = (substr($baseURL, -1) === '/') ? $baseURL : $baseURL . '/';
-        $url = 'api/oauth.access?';
-
-        return array($code, $config, $baseURL, $url);
     }
 }

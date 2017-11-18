@@ -5,7 +5,6 @@ namespace Firesphere\StripeSlack\Extension;
 use Firesphere\StripeSlack\Controller\SlackStatusController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
-use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
@@ -85,7 +84,8 @@ class SiteConfigExtension extends DataExtension
             TextField::create('SlackClientID', $this->owner->fieldLabel('SlackClientID')),
             PasswordField::create('SlackClientSecret', $this->owner->fieldLabel('SlackClientSecret')),
             TreeDropdownField::create('SlackBackURLID', $this->owner->fieldLabel('SlackBackURL'), SiteTree::class),
-            TreeDropdownField::create('SlackErrorBackURLID', $this->owner->fieldLabel('SlackErrorBackURL'), SiteTree::class),
+            TreeDropdownField::create('SlackErrorBackURLID', $this->owner->fieldLabel('SlackErrorBackURL'),
+                SiteTree::class),
         ]);
         if (
             $this->owner->SlackURL &&

@@ -32,9 +32,7 @@ class SlackAdmin extends ModelAdmin
             $form->Fields()
                 ->fieldByName('SlackInvite')
                 ->getConfig()
-                ->addComponent(
-                    new GridfieldInviteResendAction()
-                );
+                ->addComponent(new GridfieldInviteResendAction());
         }
 
         return $form;

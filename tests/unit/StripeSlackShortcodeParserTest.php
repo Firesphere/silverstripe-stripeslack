@@ -33,7 +33,8 @@ class StripeSlackShortcodeParserTest extends SapphireTest
         $request->setSession(new Session([]));
         Controller::curr()->setRequest($request);
 
-        $result = StripeSlackShortcodeParser::handle_shortcode([], '[stripeslack]', new ShortcodeParser(), 'stripeslack');
+        $result = StripeSlackShortcodeParser::handle_shortcode([], '[stripeslack]', new ShortcodeParser(),
+            'stripeslack');
 
         $this->assertContains('name="Name"', $result);
         $this->assertContains('name="Email"', $result);

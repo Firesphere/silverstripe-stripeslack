@@ -2,15 +2,15 @@
 
 namespace Firesphere\StripeSlack\Actions;
 
+use Firesphere\StripeSlack\Model\SlackInvite;
 use SilverStripe\Control\Controller;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
 use SilverStripe\Forms\GridField\GridField_ColumnProvider;
 use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\ORM\FieldType\DBHTMLText;
-use SilverStripe\SiteConfig\SiteConfig;
-use Firesphere\StripeSlack\Model\SlackInvite;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * class GridfieldInviteResendAction adds the resend button to the CMS for easy re-inviting
@@ -34,7 +34,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
-        return array('class' => 'col-buttons');
+        return ['class' => 'col-buttons'];
     }
 
     /**
@@ -43,7 +43,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
     public function getColumnMetadata($gridField, $columnName)
     {
         if ($columnName === 'Actions') {
-            return array('title' => '');
+            return ['title' => ''];
         }
     }
 
@@ -52,7 +52,7 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
      */
     public function getColumnsHandled($gridField)
     {
-        return array('Actions');
+        return ['Actions'];
     }
 
     /**
@@ -85,11 +85,29 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
     }
 
     /**
+     * @param $gridField
+     * @param $record
+     * @return GridField_FormAction
+     */
+    private function getGridField($gridField, $record)
+    {
+        $field = GridField_FormAction::create(
+            $gridField,
+            'Resend' . $record->ID,
+            false,
+            'resend',
+            ['RecordID' => $record->ID]
+        )->addExtraClass('gridfield-button-resend');
+
+        return $field;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getActions($gridField)
     {
-        return array('resend');
+        return ['resend'];
     }
 
     /**
@@ -121,23 +139,5 @@ class GridfieldInviteResendAction implements GridField_ColumnProvider, GridField
                 );
             }
         }
-    }
-
-    /**
-     * @param $gridField
-     * @param $record
-     * @return GridField_FormAction
-     */
-    private function getGridField($gridField, $record)
-    {
-        $field = GridField_FormAction::create(
-            $gridField,
-            'Resend' . $record->ID,
-            false,
-            'resend',
-            ['RecordID' => $record->ID]
-        )->addExtraClass('gridfield-button-resend');
-
-        return $field;
     }
 }

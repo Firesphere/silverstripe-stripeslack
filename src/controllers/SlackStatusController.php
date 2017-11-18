@@ -39,25 +39,6 @@ class SlackStatusController extends Controller
         return $this->getStatus($config, $params);
     }
 
-    /**
-     * @return HTTPResponse
-     * @throws ValidationException
-     */
-    public function badge()
-    {
-        $config = SiteConfig::current_site_config();
-        $params = $this->getRequestParams($config);
-        $count = $this->getStatus($config, $params);
-        list($width, $pos) = $this->getSVGSettings($count);
-
-        $body = $this->renderWith('SVGTemplate', ['Count' => $count, 'Width' => $width, 'Pos' => $pos]);
-        $response = new HTTPResponse($body);
-        $response->addHeader('Content-Type', 'image/svg+xml');
-
-        return $response;
-    }
-
-
     protected function getRequestParams($config)
     {
         return [
@@ -115,26 +96,6 @@ class SlackStatusController extends Controller
     }
 
     /**
-     * @param $count
-     * @return array
-     */
-    public function getSVGSettings($count)
-    {
-        if ($count < 100) {
-            $width = 25;
-            $pos = 60;
-        } elseif ($count < 1000) {
-            $width = 35;
-            $pos = 65;
-        } else {
-            $width = 45;
-            $pos = 70;
-        }
-
-        return [$width, $pos];
-    }
-
-    /**
      * @param $config
      * @return Client
      */
@@ -162,5 +123,43 @@ class SlackStatusController extends Controller
         }
 
         return 0;
+    }
+
+    /**
+     * @return HTTPResponse
+     * @throws ValidationException
+     */
+    public function badge()
+    {
+        $config = SiteConfig::current_site_config();
+        $params = $this->getRequestParams($config);
+        $count = $this->getStatus($config, $params);
+        list($width, $pos) = $this->getSVGSettings($count);
+
+        $body = $this->renderWith('SVGTemplate', ['Count' => $count, 'Width' => $width, 'Pos' => $pos]);
+        $response = new HTTPResponse($body);
+        $response->addHeader('Content-Type', 'image/svg+xml');
+
+        return $response;
+    }
+
+    /**
+     * @param $count
+     * @return array
+     */
+    public function getSVGSettings($count)
+    {
+        if ($count < 100) {
+            $width = 25;
+            $pos = 60;
+        } elseif ($count < 1000) {
+            $width = 35;
+            $pos = 65;
+        } else {
+            $width = 45;
+            $pos = 70;
+        }
+
+        return [$width, $pos];
     }
 }

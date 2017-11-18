@@ -2,6 +2,7 @@
 
 namespace Firesphere\StripeSlack\Form;
 
+use Firesphere\StripeSlack\Model\SlackInvite;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\EmailField;
@@ -11,7 +12,6 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\SiteConfig\SiteConfig;
-use Firesphere\StripeSlack\Model\SlackInvite;
 
 class SlackSignupForm extends Form
 {
@@ -118,7 +118,8 @@ class SlackSignupForm extends Form
             if ($config->SlackErrorBackURLID) {
                 return $this->controller->redirect($config->SlackErrorBackURL()->Link());
             }
-            $this->controller->redirect($this->controller->Link('error'));
+
+            return $this->controller->redirect($this->controller->Link('oops'));
         }
         if ($config->SlackBackURLID) {
             return $this->controller->redirect($config->SlackBackURL()->Link());
