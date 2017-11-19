@@ -13,7 +13,7 @@ class SlackInviteTest extends SapphireTest
 {
     protected static $fixture_file = '../fixtures/signups.yml';
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
     }

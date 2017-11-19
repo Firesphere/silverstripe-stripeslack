@@ -15,7 +15,7 @@ class SlackStatusControllerTest extends SapphireTest
     protected static $fixture_file = '../fixtures/count.yml';
 
 
-    public function setUp()
+    protected function setUp()
     {
         $config = SiteConfig::current_site_config();
         $config->SlackURL = 'https://team.slack.com';
@@ -25,7 +25,7 @@ class SlackStatusControllerTest extends SapphireTest
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         /** @var DataList|SlackUserCount[] $counts */
         $counts = SlackUserCount::get();

@@ -34,9 +34,8 @@ class SlackStatusController extends Controller
         if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
             return '';
         }
-        $params = $this->getRequestParams($config);
 
-        return $this->getStatus($config, $params);
+        return $this->getStatus($config);
     }
 
     protected function getRequestParams($config)
@@ -53,11 +52,10 @@ class SlackStatusController extends Controller
 
     /**
      * @param SiteConfig $config
-     * @param array $params
      * @return int
      * @throws ValidationException
      */
-    public function getStatus($config, $params = [])
+    public function getStatus($config)
     {
         /** @var SlackUserCount $count */
         $count = SlackUserCount::get()->first();
@@ -74,19 +72,19 @@ class SlackStatusController extends Controller
             $count = SlackUserCount::create();
         }
 
-        return $this->getSlackCount($config, $params, $count);
+        return $this->getSlackCount($config, $count);
     }
 
     /**
      * @param SiteConfig $config
-     * @param array $params
      * @param SlackUserCount $count
      * @return int
      * @throws ValidationException
      */
-    protected function getSlackCount($config, $params, $count)
+    protected function getSlackCount($config, $count)
     {
         $service = $this->getClient($config);
+        $params = $this->getRequestParams($config);
         $url = 'api/channels.info?t=' . time();
 
         $response = $service->request('POST', $url, $params);
@@ -132,8 +130,7 @@ class SlackStatusController extends Controller
     public function badge()
     {
         $config = SiteConfig::current_site_config();
-        $params = $this->getRequestParams($config);
-        $count = $this->getStatus($config, $params);
+        $count = $this->getStatus($config);
         list($width, $pos) = $this->getSVGSettings($count);
 
         $body = $this->renderWith('SVGTemplate', ['Count' => $count, 'Width' => $width, 'Pos' => $pos]);

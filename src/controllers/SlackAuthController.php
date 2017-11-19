@@ -3,10 +3,10 @@
 namespace Firesphere\StripeSlack\Controller;
 
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\SiteConfig\SiteConfig;
@@ -76,7 +76,7 @@ class SlackAuthController extends Controller
     }
 
     /**
-     * @param ResponseInterface $response
+     * @param HTTPResponse $response
      * @param SiteConfig $config
      * @throws ValidationException
      */

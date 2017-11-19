@@ -22,13 +22,13 @@ class SlackAuthControllerTest extends SapphireTest
      */
     protected $controller;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->controller = Injector::inst()->get(SlackAuthController::class);
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
     }
