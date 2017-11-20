@@ -65,8 +65,11 @@ class SlackAuthControllerTest extends SapphireTest
         $config = SiteConfig::current_site_config();
         $config->SlackURL = 'https://team.slack.com';
         $config->write();
-        $result = $controller->getConfig(new HTTPRequest('GET', 'https://team.slack.com/api/something',
-            ['code' => '1234567890']));
+        $result = $controller->getConfig(new HTTPRequest(
+            'GET',
+            'https://team.slack.com/api/something',
+            ['code' => '1234567890']
+        ));
         $this->assertEquals('1234567890', $result[0]);
         $this->assertInstanceOf(SiteConfig::class, $result[1]);
         $this->assertEquals($config->SlackURL . '/', $result[2]);

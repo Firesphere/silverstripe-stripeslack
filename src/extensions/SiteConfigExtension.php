@@ -84,8 +84,11 @@ class SiteConfigExtension extends DataExtension
             TextField::create('SlackClientID', $this->owner->fieldLabel('SlackClientID')),
             PasswordField::create('SlackClientSecret', $this->owner->fieldLabel('SlackClientSecret')),
             TreeDropdownField::create('SlackBackURLID', $this->owner->fieldLabel('SlackBackURL'), SiteTree::class),
-            TreeDropdownField::create('SlackErrorBackURLID', $this->owner->fieldLabel('SlackErrorBackURL'),
-                SiteTree::class),
+            TreeDropdownField::create(
+                'SlackErrorBackURLID',
+                $this->owner->fieldLabel('SlackErrorBackURL'),
+                SiteTree::class
+            ),
         ]);
         if (
             $this->owner->SlackURL &&
