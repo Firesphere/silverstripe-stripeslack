@@ -1,3 +1,8 @@
+---
+Name: stripeslackconfig
+After:
+  - '#cmsextensions'
+---
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - Firesphere\StripeSlack\Extension\SiteConfigExtension
