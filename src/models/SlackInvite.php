@@ -1,5 +1,19 @@
 <?php
 
+namespace Firesphere\StripeSlack\Model;
+
+use GuzzleHttp\Client;
+use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionProvider;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class SlackInvite
@@ -32,6 +46,8 @@ class SlackInvite extends DataObject implements PermissionProvider
         'Email'        => 'Email address',
         'Invited.Nice' => 'Invite successful'
     ];
+
+    private static $table_name = 'SlackInvite';
 
     private static $messages = [
         'not_authed'        => 'No valid Slack Token provided, please check your settings',
@@ -81,12 +97,12 @@ class SlackInvite extends DataObject implements PermissionProvider
         if ($this->Invited) {
             $fields->push(
                 BetterButtonCustomAction::create('resendInvite', 'Resend')
-                ->setRedirectType(BetterButtonCustomAction::REFRESH)
+                    ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         } else {
             $fields->push(
                 BetterButtonCustomAction::create('resendInvite', 'Retry')
-                ->setRedirectType(BetterButtonCustomAction::REFRESH)
+                    ->setRedirectType(BetterButtonCustomAction::REFRESH)
             );
         }
 
@@ -112,6 +128,7 @@ class SlackInvite extends DataObject implements PermissionProvider
      * This method is public, so it can be addressed from the CMS.
      *
      * @param bool $resend
+     * @return bool|SlackInvite|string
      * @throws ValidationException
      */
     public function inviteUser($resend = false)
@@ -122,24 +139,25 @@ class SlackInvite extends DataObject implements PermissionProvider
         if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
             $this->Invited = false;
         } else {
-            /** @var RestfulService $service with an _uncached_ response */
             $params = [
-                'token'      => $config->SlackToken,
-                'type'       => 'post',
-                'email'      => $this->Email,
-                'set_active' => true,
-                'channel'    => $config->SlackChannel,
-                'scope'      => 'identify,read,post,client',
+                'form_params' => [
+                    'token'      => $config->SlackToken,
+                    'type'       => 'post',
+                    'email'      => $this->Email,
+                    'set_active' => true,
+                    'channel'    => $config->SlackChannel,
+                    'scope'      => 'identify,read,post,client',
+                ]
             ];
 
             if ($resend) {
-                $params['resend'] = true;
+                $params['form_params']['resend'] = true;
             }
             if ($this->Name) {
-                $params['first_name'] = $this->Name;
+                $params['form_params']['first_name'] = $this->Name;
             }
 
-            $this->doRequestEmail($config, $params);
+            return $this->doRequestEmail($config, $params);
         }
     }
 
@@ -147,30 +165,18 @@ class SlackInvite extends DataObject implements PermissionProvider
     /**
      * @param SiteConfig $config
      * @param array $params
-     * @return bool|$this
-     * @throws \ValidationException
+     * @return bool|$this|string
+     * @throws ValidationException
      */
     private function doRequestEmail($config, $params)
     {
         $now = time();
-        $service = RestfulService::create($config->SlackURL, 0);
+        $service = new Client(['base_uri' => $config->SlackURL]);
 
-        $response = $service->request('/api/users.admin.invite?t=' . $now, 'POST', $params);
+        $response = $service->request('POST', '/api/users.admin.invite?t=' . $now, $params);
         $result = Convert::json2array($response->getBody());
 
-        if (isset($result['error'])) {
-            /** @noinspection PhpParamsInspection */
-            SS_Log::log($result['error'], SS_Log::ERR);
-            $this->Message = static::$messages[$result['error']];
-
-            if ($result['error'] === 'already_invited' || $result['error'] === 'already_in_team') {
-                $this->Message .= '; Invite successful';
-                $this->Invited = true;
-            }
-        } else {
-            $this->Message = 'Invite successful';
-            $this->Invited = (bool)$result['ok'];
-        }
+        $this->handleResult($result);
 
         if ($this->Invited) {
             $this->deleteDuplicates();
@@ -184,13 +190,30 @@ class SlackInvite extends DataObject implements PermissionProvider
         if ((bool)$this->Invited === true && $isModelAdmin) {
             $this->write();
 
-            return $this->Message;
-        } elseif ($isModelAdmin) {
-            return $this->Message;
+            return true;
         }
 
-        return $this;
+        return false;
     }
+
+    /**
+     * @param array $result
+     */
+    public function handleResult($result)
+    {
+        if (isset($result['error'])) {
+            $this->Message = static::$messages[$result['error']];
+
+            if ($result['error'] === 'already_invited' || $result['error'] === 'already_in_team') {
+                $this->Message .= '; Invite successful';
+                $this->Invited = true;
+            }
+        } else {
+            $this->Message = 'Invite successful';
+            $this->Invited = (bool)$result['ok'];
+        }
+    }
+
 
     /**
      * Remove duplicates after a successful invite
@@ -216,7 +239,7 @@ class SlackInvite extends DataObject implements PermissionProvider
     {
         // Resend the invite. If the user has been invited before it should re-send
         // The instance is needed so we know if we should write inside the `inviteUser` method
-        $this->inviteUser((bool)$this->Invited);
+        return $this->inviteUser((bool)$this->Invited);
     }
 
     /**

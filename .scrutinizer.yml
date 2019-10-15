@@ -1,0 +1,17 @@
+checks:
+  php: true
+
+build:
+  nodes:
+    analysis:
+      tests:
+        override: [php-scrutinizer-run]
+
+filter:
+  paths: ["src/*", "tests/*"]
+  excluded_paths:
+    - "tests/mock/"
+    - "src/actions"
+    - "src/admins"
+    - "src/extensions"
+    - "src/pages"

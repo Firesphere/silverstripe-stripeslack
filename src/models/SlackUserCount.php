@@ -1,5 +1,9 @@
 <?php
 
+namespace Firesphere\StripeSlack\Model;
+
+use SilverStripe\ORM\DataObject;
+
 /**
  * Class SlackUserCount
  *
@@ -10,4 +14,6 @@ class SlackUserCount extends DataObject
     private static $db = [
         'UserCount' => 'Int',
     ];
+
+    private static $table_name = 'SlackUserCount';
 }

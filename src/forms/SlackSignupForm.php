@@ -1,5 +1,17 @@
 <?php
 
+namespace Firesphere\StripeSlack\Form;
+
+use Firesphere\StripeSlack\Model\SlackInvite;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\EmailField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\SiteConfig\SiteConfig;
 
 class SlackSignupForm extends Form
 {
@@ -82,7 +94,7 @@ class SlackSignupForm extends Form
      * @param array $data
      * @param SlackSignupForm $form
      */
-    protected function submitSlackForm($data, $form)
+    public function submitSlackForm($data, $form)
     {
         $signup = SlackInvite::create();
         $form->saveInto($signup);
@@ -97,7 +109,7 @@ class SlackSignupForm extends Form
      * Plus a check if the URL's are set on the config.
      *
      * @param boolean $success
-     * @return bool|SS_HTTPResponse
+     * @return bool|HTTPResponse
      */
     public function redirectSlack($success)
     {
@@ -106,7 +118,8 @@ class SlackSignupForm extends Form
             if ($config->SlackErrorBackURLID) {
                 return $this->controller->redirect($config->SlackErrorBackURL()->Link());
             }
-            $this->controller->redirect($this->controller->Link('error'));
+
+            return $this->controller->redirect($this->controller->Link('oops'));
         }
         if ($config->SlackBackURLID) {
             return $this->controller->redirect($config->SlackBackURL()->Link());

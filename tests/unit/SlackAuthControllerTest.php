@@ -1,5 +1,15 @@
 <?php
 
+namespace Firesphere\StripeSlack\Test;
+
+use Firesphere\StripeSlack\Controller\SlackAuthController;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\SiteConfig\SiteConfig;
+
 /**
  * Test various items on the SlackAuthController
  *
@@ -12,13 +22,13 @@ class SlackAuthControllerTest extends SapphireTest
      */
     protected $controller;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->controller = Injector::inst()->get('SlackAuthController');
+        $this->controller = Injector::inst()->get(SlackAuthController::class);
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
     }
@@ -39,7 +49,7 @@ class SlackAuthControllerTest extends SapphireTest
 
     public function testSaveToken()
     {
-        $response = new RestfulService_Response('{"access_token":"12345678chdiyp67"}');
+        $response = new HTTPResponse('{"access_token":"12345678chdiyp67"}');
 
         $config = SiteConfig::current_site_config();
 
@@ -55,9 +65,14 @@ class SlackAuthControllerTest extends SapphireTest
         $config = SiteConfig::current_site_config();
         $config->SlackURL = 'https://team.slack.com';
         $config->write();
-        $result = $controller->getConfig(new SS_HTTPRequest('GET', 'https://team.slack.com/api/something', ['code' => '1234567890']));
+        $result = $controller->getConfig(new HTTPRequest(
+            'GET',
+            'https://team.slack.com/api/something',
+            ['code' => '1234567890']
+        ));
         $this->assertEquals('1234567890', $result[0]);
-        $this->assertInstanceOf('SiteConfig', $result[1]);
+        $this->assertInstanceOf(SiteConfig::class, $result[1]);
+        $this->assertEquals($config->SlackURL . '/', $result[2]);
         $this->assertEquals('api/oauth.access?', $result[3]);
     }
 }

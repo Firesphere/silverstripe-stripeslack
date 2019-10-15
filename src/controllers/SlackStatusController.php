@@ -1,5 +1,15 @@
 <?php
 
+namespace Firesphere\StripeSlack\Controller;
+
+use Firesphere\StripeSlack\Model\SlackUserCount;
+use GuzzleHttp\Client;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class SlackStatusController
@@ -24,54 +34,35 @@ class SlackStatusController extends Controller
         if (!$config->SlackURL || !$config->SlackToken || !$config->SlackChannel) {
             return '';
         }
-        $params = $this->getRequestParams($config);
 
-        return $this->getStatus($config, $params);
+        return $this->getStatus($config);
     }
-
-    /**
-     * @return SS_HTTPResponse
-     * @throws ValidationException
-     */
-    public function badge()
-    {
-        $config = SiteConfig::current_site_config();
-        $params = $this->getRequestParams($config);
-        $count = $this->getStatus($config, $params);
-        list($width, $pos) = $this->getSVGSettings($count);
-
-        $body = $this->renderWith('SVGTemplate', ['Count' => $count, 'Width' => $width, 'Pos' => $pos]);
-        $response = new SS_HTTPResponse($body);
-        $response->addHeader('Content-Type', 'image/svg+xml');
-
-        return $response;
-    }
-
 
     protected function getRequestParams($config)
     {
         return [
-            'token'   => $config->SlackToken,
-            'type'    => 'post',
-            'channel' => $config->SlackChannel,
-            'scope'   => 'identify,read,post,client',
+            'form_params' => [
+                'token'   => $config->SlackToken,
+                'type'    => 'post',
+                'channel' => $config->SlackChannel,
+                'scope'   => 'identify,read,post,client',
+            ]
         ];
     }
 
     /**
      * @param SiteConfig $config
-     * @param array $params
      * @return int
      * @throws ValidationException
      */
-    public function getStatus($config, $params = [])
+    public function getStatus($config)
     {
         /** @var SlackUserCount $count */
         $count = SlackUserCount::get()->first();
         // To limit the amount of API requests, only update the count
         // once every 3 hours
         if ($count) {
-            $dateTime = SS_Datetime::create();
+            $dateTime = DBDatetime::create();
             $dateTime->setValue($count->LastEdited);
             $diff = explode(' ', $dateTime->TimeDiffIn('hours'));
             if ($diff[0] < 3) {
@@ -81,24 +72,72 @@ class SlackStatusController extends Controller
             $count = SlackUserCount::create();
         }
 
-        return $this->getSlackCount($config, $params, $count);
+        return $this->getSlackCount($config, $count);
     }
 
     /**
      * @param SiteConfig $config
-     * @param array $params
      * @param SlackUserCount $count
      * @return int
-     * @throws \ValidationException
+     * @throws ValidationException
      */
-    protected function getSlackCount($config, $params, $count)
+    protected function getSlackCount($config, $count)
     {
-        list($url, $service) = $this->getRestfulService($config);
+        $service = $this->getClient($config);
+        $params = $this->getRequestParams($config);
+        $url = 'api/channels.info?t=' . time();
 
-        $response = $service->request($url, 'POST', $params);
+        $response = $service->request('POST', $url, $params);
         $result = Convert::json2array($response->getBody());
 
         return $this->validateResponse($count, $result);
+    }
+
+    /**
+     * @param $config
+     * @return Client
+     */
+    public function getClient($config)
+    {
+        $baseURL = $config->SlackURL;
+        $baseURL = (substr($baseURL, -1) === '/') ? $baseURL : $baseURL . '/';
+
+        return new Client(['base_uri' => $baseURL]);
+    }
+
+    /**
+     * @param SlackUserCount $count
+     * @param array $result
+     * @return int
+     */
+    public function validateResponse($count, $result)
+    {
+        if (isset($result['ok']) && $result['ok']) {
+            $userCount = count($result['channel']['members']);
+            $count->UserCount = $userCount;
+            $count->write();
+
+            return $userCount;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @return HTTPResponse
+     * @throws ValidationException
+     */
+    public function badge()
+    {
+        $config = SiteConfig::current_site_config();
+        $count = $this->getStatus($config);
+        list($width, $pos) = $this->getSVGSettings($count);
+
+        $body = $this->renderWith('SVGTemplate', ['Count' => $count, 'Width' => $width, 'Pos' => $pos]);
+        $response = new HTTPResponse($body);
+        $response->addHeader('Content-Type', 'image/svg+xml');
+
+        return $response;
     }
 
     /**
@@ -119,40 +158,5 @@ class SlackStatusController extends Controller
         }
 
         return [$width, $pos];
-    }
-
-    /**
-     * @param $config
-     * @return array
-     */
-    public function getRestfulService($config)
-    {
-        $now = time();
-        $baseURL = $config->SlackURL;
-        $baseURL = (substr($baseURL, -1) === '/') ? $baseURL : $baseURL . '/';
-        $url = 'api/channels.info?t=' . $now;
-
-        /** @var RestfulService $service with an _uncached_ response */
-        $service = RestfulService::create($baseURL, 0);
-
-        return array($url, $service);
-    }
-
-    /**
-     * @param SlackUserCount $count
-     * @param array $result
-     * @return int
-     */
-    public function validateResponse($count, $result)
-    {
-        if (isset($result['ok']) && $result['ok']) {
-            $userCount = count($result['channel']['members']);
-            $count->UserCount = $userCount;
-            $count->write();
-
-            return $userCount;
-        }
-
-        return 0;
     }
 }

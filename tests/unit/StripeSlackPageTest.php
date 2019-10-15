@@ -1,5 +1,13 @@
 <?php
 
+namespace Firesphere\StripeSlack\Test;
+
+use Firesphere\StripeSlack\Controller\StripeSlackPageController;
+use Firesphere\StripeSlack\Form\SlackSignupForm;
+use Firesphere\StripeSlack\Page\StripeSlackPage;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Forms\FieldList;
+
 class StripeSlackPageTest extends SapphireTest
 {
     public function testCMSFields()
@@ -7,22 +15,21 @@ class StripeSlackPageTest extends SapphireTest
         $class = StripeSlackPage::create();
         $fields = $class->getCMSFields();
 
-        $this->assertInstanceOf('FieldList', $fields);
+        $this->assertInstanceOf(FieldList::class, $fields);
     }
 
     public function testSlackSignupForm()
     {
-        $this->assertInstanceOf('SlackSignupForm', StripeSlackPage_Controller::create()->SlackSignupForm());
+        $this->assertInstanceOf(SlackSignupForm::class, StripeSlackPageController::create()->SlackSignupForm());
     }
 
     public function testSlackSignupFormSuccess()
     {
-        $this->assertInstanceOf('StripeSlackPage_Controller', StripeSlackPage_Controller::create()->success());
+        $this->assertInstanceOf(StripeSlackPageController::class, StripeSlackPageController::create()->success());
     }
 
     public function testSlackSignupFormError()
     {
-        $this->assertInstanceOf('StripeSlackPage_Controller', StripeSlackPage_Controller::create()->oops());
+        $this->assertInstanceOf(StripeSlackPageController::class, StripeSlackPageController::create()->oops());
     }
-
 }

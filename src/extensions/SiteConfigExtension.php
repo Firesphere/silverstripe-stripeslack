@@ -1,10 +1,24 @@
 <?php
 
+namespace Firesphere\StripeSlack\Extension;
+
+use Firesphere\StripeSlack\Controller\SlackStatusController;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Director;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\PasswordField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\TreeDropdownField;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class StripeSlackSiteConfigExtension
  *
- * @property SiteConfig|StripeSlackSiteConfigExtension $owner
+ * @property SiteConfig|SiteConfigExtension $owner
  * @property string $SlackURL
  * @property string $SlackClientID
  * @property string $SlackClientSecret
@@ -16,7 +30,7 @@
  * @method SiteTree SlackBackURL()
  * @method SiteTree SlackErrorBackURL()
  */
-class StripeSlackSiteConfigExtension extends DataExtension
+class SiteConfigExtension extends DataExtension
 {
     private static $db = [
         'SlackURL'          => 'Varchar(255)',
@@ -69,8 +83,12 @@ class StripeSlackSiteConfigExtension extends DataExtension
             $channel = TextField::create('SlackChannel', $this->owner->fieldLabel('SlackChannel')),
             TextField::create('SlackClientID', $this->owner->fieldLabel('SlackClientID')),
             PasswordField::create('SlackClientSecret', $this->owner->fieldLabel('SlackClientSecret')),
-            TreeDropdownField::create('SlackBackURLID', $this->owner->fieldLabel('SlackBackURL'), 'SiteTree'),
-            TreeDropdownField::create('SlackErrorBackURLID', $this->owner->fieldLabel('SlackErrorBackURL'), 'SiteTree'),
+            TreeDropdownField::create('SlackBackURLID', $this->owner->fieldLabel('SlackBackURL'), SiteTree::class),
+            TreeDropdownField::create(
+                'SlackErrorBackURLID',
+                $this->owner->fieldLabel('SlackErrorBackURL'),
+                SiteTree::class
+            ),
         ]);
         if (
             $this->owner->SlackURL &&
@@ -91,7 +109,7 @@ class StripeSlackSiteConfigExtension extends DataExtension
                 'Root.Slack',
                 [
                     $secretField = CheckboxField::create('ClearSecrets', $this->owner->fieldLabel('ClearSecrets')),
-                    ReadonlyField::create('Users on Slack', SlackStatusController::create()->usercount(new SS_HTTPRequest('GET', '/SlackStatus/usercount')))
+                    ReadonlyField::create('Usercount', 'Users on slack', SlackStatusController::create()->usercount())
                 ]
             );
             $secretField->setDescription(static::$helptexts['ClearSecrets']);

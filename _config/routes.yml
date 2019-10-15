@@ -1,7 +1,7 @@
 ---
 Name: stripeslackroutes
 ---
-Director:
+SilverStripe\Control\Director:
   rules:
-    'SlackAuthorization': SlackAuthController
-    'SlackStatus//$Action/$ID/$OtherID': SlackStatusController
+    'SlackAuthorization': Firesphere\StripeSlack\Controller\SlackAuthController
+    'SlackStatus//$Action/$ID/$OtherID': Firesphere\StripeSlack\Controller\SlackStatusController
