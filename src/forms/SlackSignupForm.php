@@ -94,7 +94,7 @@ class SlackSignupForm extends Form
      * @param array $data
      * @param SlackSignupForm $form
      */
-    protected function submitSlackForm($data, $form)
+    public function submitSlackForm($data, $form)
     {
         $signup = SlackInvite::create();
         $form->saveInto($signup);
